@@ -20,7 +20,7 @@ module OmniAuth
           :updated_at           => raw_info['data']['updated_at'],
           :first_name           => raw_info['data']['first_name'],
           :last_name            => raw_info['data']['last_name'],
-          :graduation           => raw_info['data']['graduation'],
+          :level_of_study       => raw_info['data']['level_of_study'],
           :major                => raw_info['data']['major'],
           :shirt_size           => raw_info['data']['shirt_size'],
           :dietary_restrictions => raw_info['data']['dietary_restrictions'],
