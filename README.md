@@ -1,16 +1,12 @@
-# OmniAuth MLH
+# MLH/my-mlh-omniauth
 
-This is the official OmniAuth strategy for authenticating to My MLH. To use
-it, you'll need to sign up for an OAuth2 Application ID and Secret on the
-[My MLH Applications Page](https://my.mlh.io/oauth/applications).
+This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
+authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to 
+[register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
 
-# Usage
+It now supports [MyMLH API V2](http://news.mlh.io/introducing-mymlh-v2-09-29-2016).
 
-```
-use OmniAuth::Builder do
-  provider :mlh, ENV['MLH_KEY'], ENV['MLH_SECRET']
-end
-```
+Once you have done so, you can follow the instructions below:
 
 ## Installation
 
@@ -28,9 +24,26 @@ Or install it yourself as:
 
     $ gem install omniauth-mlh
 
+## Usage (Rack)
+
+```
+use OmniAuth::Builder do
+  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+end
+```
+
+## Usage (Rails with Devise)
+
+```
+# config/devise.rb
+Devise.setup do |config|
+  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+end
+```
+
 ## Contributing
 
-1. Fork it ( https://github.com/mlh/omniauth-mlh/fork )
+1. Fork it ( https://github.com/mlh/my-mlh-omniauth/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -39,6 +52,6 @@ Or install it yourself as:
 ## Questions?
 
 Have a question about the API or this library? Start by checking out the
-[official My MLH documentation](https://my.mlh.io/docs). If you still can't
+[official MyMLH documentation](https://my.mlh.io/docs). If you still can't
 find an answer, tweet at [@MLHacks](http://twitter.com/mlhacks) or drop an
 email to [hi@mlh.io](mailto://hi@mlh.io).
