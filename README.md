@@ -6,7 +6,7 @@ This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy f
 authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to 
 [register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
 
-It now supports [MyMLH API V2](http://news.mlh.io/introducing-mymlh-v2-09-29-2016).
+It now supports [MyMLH API V2](http://news.mlh.io/introducing-mymlh-v2-09-29-2016). [Read the MyMLH V2 docs here](https://my.mlh.io/docs).
 
 Once you have done so, you can follow the instructions below:
 
@@ -28,7 +28,7 @@ Or install it yourself as:
 
 ## Usage (Rack)
 
-```
+```ruby
 use OmniAuth::Builder do
   provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
 end
@@ -36,7 +36,7 @@ end
 
 ## Usage (Rails with Devise)
 
-```
+```ruby
 # config/devise.rb
 Devise.setup do |config|
   config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
