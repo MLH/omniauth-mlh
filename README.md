@@ -10,6 +10,10 @@ It now supports [MyMLH API V2](http://news.mlh.io/introducing-mymlh-v2-09-29-201
 
 Once you have done so, you can follow the instructions below:
 
+## Requirements
+
+You need to have at least Ruby 2.2.4 to use this gem.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -38,6 +42,7 @@ end
 
 ```ruby
 # config/devise.rb
+
 Devise.setup do |config|
   config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
 end
@@ -51,9 +56,13 @@ end
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
+## Credit
+
+We used part of [datariot/omniauth-paypal](http://github.com/datariot/omniauth-paypal)'s code to help us test this gem.
+
 ## Questions?
 
 Have a question about the API or this library? Start by checking out the
 [official MyMLH documentation](https://my.mlh.io/docs). If you still can't
 find an answer, tweet at [@MLHacks](http://twitter.com/mlhacks) or drop an
-email to [hi@mlh.io](mailto://hi@mlh.io).
+email to [engineering@mlh.io](mailto:engineering@mlh.io).

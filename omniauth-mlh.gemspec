@@ -14,6 +14,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://github.com/mlh/omniauth-mlh"
   spec.license       = "MIT"
 
+  spec.required_ruby_version = '>= 2.2.4'
+
   spec.executables    = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   spec.files          = `git ls-files`.split("\n")
   spec.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -21,6 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'omniauth', '~> 1.0'
   spec.add_dependency 'omniauth-oauth2', '~> 1.3.1'
+  spec.add_dependency 'activesupport'
 
   spec.add_development_dependency 'rspec', '~> 2.7'
   spec.add_development_dependency 'rake', '~> 10.5'
