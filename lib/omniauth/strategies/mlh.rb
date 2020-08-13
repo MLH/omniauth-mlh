@@ -23,9 +23,6 @@ module OmniAuth
           :last_name,
           :level_of_study,
           :major,
-          :shirt_size,
-          :dietary_restrictions,
-          :special_needs,
           :date_of_birth,
           :gender,
           :phone_number,
@@ -35,7 +32,7 @@ module OmniAuth
       end
 
       def data
-        @data ||= access_token.get('/api/v2/user.json').parsed.deep_symbolize_keys[:data] rescue {}
+        @data ||= access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data] rescue {}
       end
     end
   end
