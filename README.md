@@ -3,10 +3,10 @@
 [![Build Status](https://travis-ci.org/MLH/my-mlh-omniauth.svg?branch=master)](https://travis-ci.org/MLH/my-mlh-omniauth)
 
 This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
-authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to 
+authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
 [register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
 
-It now supports [MyMLH API V2](http://news.mlh.io/introducing-mymlh-v2-09-29-2016). [Read the MyMLH V2 docs here](https://my.mlh.io/docs).
+It now supports MyMLH API V3. [Read the MyMLH V3 docs here](https://my.mlh.io/docs).
 
 Once you have done so, you can follow the instructions below:
 

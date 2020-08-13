@@ -35,7 +35,7 @@ module OmniAuth
       end
 
       def data
-        @data ||= access_token.get('/api/v2/user.json').parsed.deep_symbolize_keys[:data] rescue {}
+        @data ||= access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data] rescue {}
       end
     end
   end
