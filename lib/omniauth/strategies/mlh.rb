@@ -26,6 +26,9 @@ module OmniAuth
           :date_of_birth,
           :gender,
           :phone_number,
+          :profession_type,
+          :company_name,
+          :company_title,
           :scopes,
           :school
         )
