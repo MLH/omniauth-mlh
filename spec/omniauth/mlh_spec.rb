@@ -13,11 +13,11 @@ describe OmniAuth::MLH do
     end
 
     it 'has correct authorize url' do
-      expect(subject.client.options[:authorize_url]).to eq('/oauth/authorize')
+      expect(subject.client.options[:authorize_url]).to eq('oauth/authorize')
     end
 
     it 'has correct token url' do
-      expect(subject.client.options[:token_url]).to eq('/oauth/token')
+      expect(subject.client.options[:token_url]).to eq('oauth/token')
     end
 
     it 'runs the setup block if passed one' do
