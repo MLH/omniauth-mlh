@@ -8,8 +8,8 @@ module OmniAuth
 
       option :client_options, {
         :site            => 'https://my.mlh.io',
-        :authorize_path  => '/oauth/authorize',
-        :token_path      => '/oauth/token'
+        :authorize_url   => 'oauth/authorize',
+        :token_url       => 'oauth/token'
       }
 
       uid { data[:id] }
@@ -42,3 +42,5 @@ module OmniAuth
 end
 
 OmniAuth.config.add_camelization 'mlh', 'MLH'
+OmniAuth.config.allowed_request_methods = [:post, :get]
+OmniAuth.config.silence_get_warning = true

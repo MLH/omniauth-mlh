@@ -12,7 +12,7 @@ Once you have done so, you can follow the instructions below:
 
 ## Requirements
 
-You need to have at least Ruby 2.2.4 to use this gem.
+You need to have at least Ruby 3.0.5 to use this gem.
 
 ## Installation
 

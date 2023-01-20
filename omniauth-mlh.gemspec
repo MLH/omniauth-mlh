@@ -9,20 +9,23 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Swift"]
   spec.email         = ["swift@mlh.io"]
 
-  spec.summary       = %q{Official OmniAuth strategy for My MLH.}
-  spec.description   = %q{Official OmniAuth strategy for My MLH.}
+  spec.summary       = %q{Official OmniAuth strategy for MyMLH.}
+  spec.description   = %q{Official OmniAuth strategy for MyMLH.}
   spec.homepage      = "http://github.com/mlh/omniauth-mlh"
   spec.license       = "MIT"
 
-  spec.required_ruby_version = '>= 2.2.4'
+  spec.required_ruby_version = '>= 2.2.0'
 
   spec.executables    = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   spec.files          = `git ls-files`.split("\n")
   spec.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'omniauth', '~> 1.0'
-  spec.add_dependency 'omniauth-oauth2', '~> 1.3.1'
+  spec.add_dependency 'oauth2', '~> 2.0.9'
+  spec.add_dependency 'omniauth', '~> 2.1.1'
+  spec.add_dependency 'omniauth-oauth2', '~> 1.8.0'
+  spec.add_dependency 'omniauth-rails_csrf_protection', '~> 1.0.1'
+
   spec.add_dependency 'activesupport'
 
   spec.add_development_dependency 'rspec', '~> 2.7'
