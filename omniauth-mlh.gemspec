@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://github.com/mlh/omniauth-mlh"
   spec.license       = "MIT"
 
-  spec.required_ruby_version = '>= 2.7.5'
+  spec.required_ruby_version = '>= 3.0.5'
 
   spec.executables    = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   spec.files          = `git ls-files`.split("\n")
