@@ -12,7 +12,8 @@ Once you have done so, you can follow the instructions below:
 
 ## Requirements
 
-You need to have at least Ruby 3.0.5 to use this gem.
+This Gem requires your Ruby version to be at least `2.2.0`, which is set
+downstream by [Omniauth](https://github.com/omniauth/omniauth/blob/master/omniauth.gemspec#L22).
 
 ## Installation
 
