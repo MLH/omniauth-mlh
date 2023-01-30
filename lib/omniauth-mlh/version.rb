@@ -1,9 +1,7 @@
+# frozen_string_literal: true
+
 module OmniAuth
   module MLH
-    MAJOR_VERSION = 0
-    MINOR_VERSION = 4
-    RELEASE_VERSION = 2
-
-    VERSION = [MAJOR_VERSION, MINOR_VERSION, RELEASE_VERSION].join('.')
+    VERSION = '0.4.2'
   end
 end

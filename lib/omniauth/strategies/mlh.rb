@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'omniauth-oauth2'
 require 'ostruct'
 
 module OmniAuth
   module Strategies
-    class MLH < OmniAuth::Strategies::OAuth2
+    class MLH < OmniAuth::Strategies::OAuth2 # :nodoc:
       option :name, :mlh
 
       option :client_options, {
-        :site            => 'https://my.mlh.io',
-        :authorize_url   => 'oauth/authorize',
-        :token_url       => 'oauth/token'
+        site: 'https://my.mlh.io',
+        authorize_url: 'oauth/authorize',
+        token_url: 'oauth/token'
       }
 
       uid { data[:id] }
@@ -35,12 +37,16 @@ module OmniAuth
       end
 
       def data
-        @data ||= access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data] rescue {}
+        @data ||= begin
+          access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data]
+        rescue StandardError
+          {}
+        end
       end
     end
   end
 end
 
 OmniAuth.config.add_camelization 'mlh', 'MLH'
-OmniAuth.config.allowed_request_methods = [:post, :get]
+OmniAuth.config.allowed_request_methods = %i[post get]
 OmniAuth.config.silence_get_warning = true

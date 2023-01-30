@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe OmniAuth::MLH do
@@ -22,14 +24,14 @@ describe OmniAuth::MLH do
 
     it 'runs the setup block if passed one' do
       counter = ''
-      @options = { :setup => Proc.new { |env| counter = 'ok' } }
+      @options = { setup: proc { |_env| counter = 'ok' } }
       subject.setup_phase
-      expect(counter).to eq("ok")
+      expect(counter).to eq('ok')
     end
   end
 
   describe '#callback_path' do
-    it "has the correct callback path" do
+    it 'has the correct callback path' do
       expect(subject.callback_path).to eq('/auth/mlh/callback')
     end
   end

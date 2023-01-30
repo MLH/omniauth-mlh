@@ -1,0 +1,12 @@
+AllCops:
+  TargetRubyVersion: '2.2.0'
+
+Naming/FileName:
+  Exclude:
+    - 'lib/omniauth-mlh.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*'
