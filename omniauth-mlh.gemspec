@@ -8,8 +8,8 @@ require 'omniauth-mlh/version'
 Gem::Specification.new do |spec|
   spec.name          = 'omniauth-mlh'
   spec.version       = OmniAuth::MLH::VERSION
-  spec.authors       = ['Swift']
-  spec.email         = ['swift@mlh.io']
+  spec.authors       = ['MLH']
+  spec.email         = ['hi@mlh.io']
 
   spec.summary       = 'Official OmniAuth strategy for MyMLH.'
   spec.description   = 'Official OmniAuth strategy for MyMLH.'
