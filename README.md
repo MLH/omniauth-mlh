@@ -74,7 +74,7 @@ Replace `X.Y.Z` with the new version number you want to release.
 
 To test Omniauth-MLH locally, you can use [Sinatra application](https://gist.github.com/theycallmeswift/d8a8a22f95dd5d35f03661b19665e0d3). Here are the steps to set up and run the application:
 
-- Add files from Sinatra application](https://gist.github.com/theycallmeswift/d8a8a22f95dd5d35f03661b19665e0d3) in a folder within a directory next to the checked out [my-mlh-omniauth](https://github.com/MLH/my-mlh-omniauth) library. 
+- Add files from [Sinatra application](https://gist.github.com/theycallmeswift/d8a8a22f95dd5d35f03661b19665e0d3) in a folder within a directory next to the checked out [my-mlh-omniauth](https://github.com/MLH/my-mlh-omniauth) library. 
 - Add your `api_key` and `api_secret` from your My MLH application to `server.rb` file
 - Install the required gems
 ```bundle install```
