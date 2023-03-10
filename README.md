@@ -1,6 +1,6 @@
 # MLH/omniauth-mlh
 
-[![Build Status](https://travis-ci.org/MLH/omniauth-mlh.svg?branch=master)](https://travis-ci.org/MLH/omniauth-mlh)
+[![Test](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml/badge.svg)](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml)
 
 This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
 authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
