@@ -8,7 +8,7 @@ require 'omniauth-mlh/version'
 Gem::Specification.new do |spec|
   spec.name          = 'omniauth-mlh'
   spec.version       = OmniAuth::MLH::VERSION
-  spec.authors       = ['MLH']
+  spec.authors       = ['Major League Hacking (MLH)']
   spec.email         = ['hi@mlh.io']
 
   spec.summary       = 'Official OmniAuth strategy for MyMLH.'
