@@ -23,5 +23,5 @@ $ bundle exec rake spec
 Code quality is enforced across the entire gem with Rubocop:
 
 ```bash
-$ bundle exec rake rubocop
+$ bundle exec rubocop
 ```

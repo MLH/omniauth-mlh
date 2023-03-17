@@ -25,6 +25,6 @@ jobs:
           gem install bundler
           bundle install
       - name: Run Spec
-        run: bundle exec rspec
+        run: bundle exec rake spec
       - name: Run Rubocop
-        run: bundle exec rake rubocop
+        run: bundle exec rubocop

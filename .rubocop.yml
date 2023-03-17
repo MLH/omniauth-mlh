@@ -1,34 +1,11 @@
+require: 
+  - rubocop-rspec
+  - rubocop-performance
+
 AllCops:
   TargetRubyVersion: '2.7.0'
-
-# Naming section allows you to enforce consistent naming conventions across your codebase.
-Naming/FileName:
   Exclude:
-    - 'lib/omniauth-mlh.rb'
+    - vendor/**/*
 
-# Metrics section allows you to enforce code complexity rules to keep the codebase maintainable.
-Metrics/BlockLength:
-  Exclude:
-    - 'Rakefile'
-    - '**/*.rake'
-    - 'spec/**/*'
-
-# Two spaces, no tabs (for indentation).
-Layout/IndentationWidth:
-  Enabled: true
-
-# No trailing whitespace.
-Layout/TrailingWhitespace:
-  Enabled: true
-
-# Blank lines should not have any spaces.
-Layout/TrailingEmptyLines:
-  Enabled: true
-
-# Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }.
-Style/HashSyntax:
-  Enabled: true
-
-# Use my_method(my_arg) not my_method( my_arg ) or my_method my_arg.
-Lint/RequireParentheses:
-  Enabled: true
+RSpec/MultipleExpectations:
+  Max: 2
