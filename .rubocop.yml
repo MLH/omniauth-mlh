@@ -8,5 +8,16 @@ AllCops:
   Exclude:
     - vendor/**/*
 
+Style/WordArray:
+  EnforcedStyle: brackets
+
+Style/SymbolArray: 
+  Description: Force symbol arrays to use bracket notation 
+  EnforcedStyle: brackets 
+  Enabled: true
+
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
+
 RSpec/MultipleExpectations:
   Max: 2
