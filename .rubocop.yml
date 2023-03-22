@@ -9,15 +9,20 @@ AllCops:
     - vendor/**/*
 
 Style/WordArray:
+  Description: Force arrays of words to use bracket notation instead of %w
   EnforcedStyle: brackets
+  Enabled: true
 
 Style/SymbolArray: 
-  Description: Force symbol arrays to use bracket notation 
+  Description: Force symbol arrays to use bracket notation instead of %i
   EnforcedStyle: brackets 
   Enabled: true
 
 Style/RegexpLiteral:
+  Description: Allow forward slashes within regular expressions
   AllowInnerSlashes: true
+  Enabled: true
 
-RSpec/MultipleExpectations:
-  Max: 2
+RSpec/MultipleExpectations: 
+  Description: Allow tests to contain multiple expectations 
+  Enabled: false

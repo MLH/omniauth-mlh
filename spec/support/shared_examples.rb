@@ -21,7 +21,7 @@ shared_examples 'an oauth2 strategy' do
     end
 
     it 'includes top-level options that are marked as :authorize_options' do
-      @options = { authorize_options: %i[scope foo], scope: 'bar', foo: 'baz' }
+      @options = { authorize_options: ['scope', 'foo'], scope: 'bar', foo: 'baz' }
 
       expect(subject.authorize_params['scope']).to eq('bar')
       expect(subject.authorize_params['foo']).to eq('baz')
@@ -37,7 +37,7 @@ shared_examples 'an oauth2 strategy' do
     end
 
     it 'includes top-level options that are marked as :token_options' do
-      @options = { token_options: %i[scope foo], scope: 'bar', foo: 'baz' }
+      @options = { token_options: [:scope, :foo], scope: 'bar', foo: 'baz' }
 
       expect(subject.token_params['scope']).to eq('bar')
       expect(subject.token_params['foo']).to eq('baz')
