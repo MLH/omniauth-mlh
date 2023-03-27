@@ -48,5 +48,5 @@ module OmniAuth
 end
 
 OmniAuth.config.add_camelization 'mlh', 'MLH'
-OmniAuth.config.allowed_request_methods = %i[post get]
+OmniAuth.config.allowed_request_methods = [:post, :get]
 OmniAuth.config.silence_get_warning = true

@@ -1,6 +1,6 @@
-# MLH/my-mlh-omniauth
+# MLH/omniauth-mlh
 
-[![Build Status](https://travis-ci.org/MLH/my-mlh-omniauth.svg?branch=master)](https://travis-ci.org/MLH/my-mlh-omniauth)
+[![Test](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml/badge.svg)](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml)
 
 This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
 authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
@@ -51,11 +51,7 @@ end
 
 ## Contributing
 
-1. Fork it ( https://github.com/mlh/my-mlh-omniauth/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+For guidance on setting up a development environment and how to make a contribution to omniauth-mlh, see the [contributing guidelines](https://github.com/MLH/omniauth-mlh/blob/main/CONTRIBUTING.md).
 
 ## Credit
 

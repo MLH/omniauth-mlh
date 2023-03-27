@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest 
+    strategy:
+      matrix:
+        ruby: ['2.7', '3.2']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Run Spec
+        run: bundle exec rake spec
+      - name: Run Rubocop
+        run: bundle exec rake rubocop

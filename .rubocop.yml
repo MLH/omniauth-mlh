@@ -1,12 +1,28 @@
+require: 
+  - rubocop-rspec
+  - rubocop-performance
+
 AllCops:
-  TargetRubyVersion: '2.2.0'
-
-Naming/FileName:
+  # Ruby 2.7 is the MINIMUM Ruby version supported
+  TargetRubyVersion: '2.7.0'
   Exclude:
-    - 'lib/omniauth-mlh.rb'
+    - vendor/**/*
 
-Metrics/BlockLength:
-  Exclude:
-    - 'Rakefile'
-    - '**/*.rake'
-    - 'spec/**/*'
+Style/WordArray:
+  Description: Force arrays of words to use bracket notation instead of %w
+  EnforcedStyle: brackets
+  Enabled: true
+
+Style/SymbolArray: 
+  Description: Force symbol arrays to use bracket notation instead of %i
+  EnforcedStyle: brackets 
+  Enabled: true
+
+Style/RegexpLiteral:
+  Description: Allow forward slashes within regular expressions
+  AllowInnerSlashes: true
+  Enabled: true
+
+RSpec/MultipleExpectations: 
+  Description: Allow tests to contain multiple expectations 
+  Enabled: false

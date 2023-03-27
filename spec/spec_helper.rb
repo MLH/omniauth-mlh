@@ -10,7 +10,7 @@ require 'rspec'
 require 'rack/test'
 require 'webmock/rspec'
 require 'omniauth'
-require 'omniauth-mlh'
+require 'omniauth_mlh'
 
 Dir[File.expand_path('support/**/*', __dir__)].sort.each { |f| require f }
 
