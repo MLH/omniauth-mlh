@@ -1,5 +1,6 @@
 # MLH/omniauth-mlh
 
+[![Gem Version](https://badge.fury.io/rb/omniauth-mlh.svg)](https://badge.fury.io/rb/omniauth-mlh)
 [![Test](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml/badge.svg)](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml)
 
 This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
