@@ -6,6 +6,7 @@ require 'simplecov'
 SimpleCov.start
 
 require 'bundler/setup'
+require 'active_support/core_ext/hash'
 require 'rspec'
 require 'rack/test'
 require 'webmock/rspec'

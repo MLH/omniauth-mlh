@@ -60,7 +60,23 @@ describe OmniAuth::MLH do
           'id' => '123',
           'email' => 'user@example.com',
           'first_name' => 'John',
-          'last_name' => 'Doe'
+          'last_name' => 'Doe',
+          'school' => {
+            'name' => 'Test University',
+            'id' => '456'
+          },
+          'level_of_study' => 'Undergraduate',
+          'major' => 'Computer Science',
+          'date_of_birth' => '1990-01-01',
+          'gender' => 'Prefer not to say',
+          'phone_number' => '+1234567890',
+          'profession_type' => 'Student',
+          'company' => {
+            'name' => 'Tech Corp',
+            'title' => 'Intern'
+          },
+          'created_at' => '2024-01-01T00:00:00Z',
+          'updated_at' => '2024-01-02T00:00:00Z'
         }
       }
     end
@@ -78,7 +94,7 @@ describe OmniAuth::MLH do
     end
 
     it 'returns parsed user data' do
-      expect(omniauth_mlh.data).to eq(api_response['data'].transform_keys(&:to_sym))
+      expect(omniauth_mlh.data).to eq(api_response.deep_symbolize_keys[:data])
     end
 
     it 'returns empty hash on error' do
