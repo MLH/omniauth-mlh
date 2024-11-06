@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'oauth2'
 
 describe OmniAuth::MLH do
   subject(:omniauth_mlh) do
@@ -54,8 +55,10 @@ describe OmniAuth::MLH do
   end
 
   describe '#raw_info' do
-    let(:access_token) { instance_double('AccessToken', get: response) }
-    let(:response) { instance_double('Response', parsed: parsed_response) }
+    let(:client) { OAuth2::Client.new('id', 'secret', site: 'https://my.mlh.io') }
+    let(:auth_code) { OAuth2::Strategy::AuthCode.new(client) }
+    let(:token) { OAuth2::AccessToken.new(client, 'token') }
+    let(:response) { instance_double(OAuth2::Response, parsed: parsed_response) }
     let(:parsed_response) do
       {
         'user' => {
@@ -72,13 +75,14 @@ describe OmniAuth::MLH do
     end
 
     before do
-      allow(omniauth_mlh).to receive(:access_token).and_return(access_token)
-      allow(omniauth_mlh).to receive(:uid).and_return('123')
+      @options = { client_id: 'id', client_secret: 'secret' }
+      allow(OAuth2::AccessToken).to receive(:new).and_return(token)
+      allow(token).to receive(:get).and_return(response)
     end
 
     it 'requests the correct API endpoint' do
-      expect(access_token).to receive(:get).with('https://api.mlh.com/v4/users/123')
       omniauth_mlh.raw_info
+      expect(token).to have_received(:get).with('https://api.mlh.com/v4/users/123')
     end
 
     it 'returns symbolized response data' do
@@ -89,7 +93,7 @@ describe OmniAuth::MLH do
 
     context 'when the request fails' do
       before do
-        allow(access_token).to receive(:get).and_raise(StandardError)
+        allow(token).to receive(:get).and_raise(StandardError)
       end
 
       it 'returns an empty hash' do
@@ -99,21 +103,25 @@ describe OmniAuth::MLH do
   end
 
   describe '#data' do
-    let(:access_token) { instance_double('AccessToken', get: response) }
-    let(:response) { instance_double('Response', parsed: { 'id' => '123' }) }
+    let(:client) { OAuth2::Client.new('id', 'secret', site: 'https://my.mlh.io') }
+    let(:auth_code) { OAuth2::Strategy::AuthCode.new(client) }
+    let(:token) { OAuth2::AccessToken.new(client, 'token') }
+    let(:response) { instance_double(OAuth2::Response, parsed: { 'id' => '123' }) }
 
     before do
-      allow(omniauth_mlh).to receive(:access_token).and_return(access_token)
+      @options = { client_id: 'id', client_secret: 'secret' }
+      allow(OAuth2::AccessToken).to receive(:new).and_return(token)
+      allow(token).to receive(:get).and_return(response)
     end
 
     it 'requests the correct API endpoint' do
-      expect(access_token).to receive(:get).with('/api/v4/me')
       omniauth_mlh.data
+      expect(token).to have_received(:get).with('/api/v4/me')
     end
 
     context 'when the request fails' do
       before do
-        allow(access_token).to receive(:get).and_raise(StandardError)
+        allow(token).to receive(:get).and_raise(StandardError)
       end
 
       it 'returns an empty hash' do

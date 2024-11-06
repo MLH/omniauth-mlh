@@ -42,38 +42,24 @@ module OmniAuth
       def raw_info
         @raw_info ||= begin
           response = access_token.get("#{options.client_options.api_site}/v4/users/#{uid}").parsed
-          puts "Raw response: #{response.inspect}"  # Debug output
-          if response.is_a?(Hash)
-            # Handle string keys in response
-            if response.key?('user')
-              result = response.deep_symbolize_keys
-              puts "Response with user key: #{result.inspect}"  # Debug output
-              result
-            else
-              result = { user: response }.deep_symbolize_keys
-              puts "Response wrapped in user key: #{result.inspect}"  # Debug output
-              result
-            end
-          else
-            {}
-          end
-        rescue StandardError => e
-          puts "Error in raw_info: #{e.message}"  # Debug output
+          normalize_response(response)
+        rescue StandardError
           {}
         end
       end
 
+      private
+
+      def normalize_response(response)
+        return {} unless response.is_a?(Hash)
+
+        response.key?('user') ? response.deep_symbolize_keys : { user: response }.deep_symbolize_keys
+      end
+
       def data
         @data ||= begin
-          # First request to get user ID
           response = access_token.get('/api/v4/me').parsed
-          if response.is_a?(Hash)
-            # Extract user ID from response
-            response = response['user'] || response
-            response.deep_symbolize_keys
-          else
-            {}
-          end
+          extract_user_data(response)
         rescue StandardError
           {}
         end
@@ -81,18 +67,32 @@ module OmniAuth
 
       def authorize_params
         super.tap do |params|
-          # Only set default scopes if no scope is provided at all
-          default_scopes = 'public user:read:profile'
-          # Don't modify scope if it's coming from authorize_options
-          unless options[:authorize_options]&.include?('scope')
-            scope = params['scope'] || params[:scope]
-            if scope.nil? || scope.empty?
-              params[:scope] = default_scopes
-            elsif !scope.include?(default_scopes)
-              params[:scope] = "#{scope} #{default_scopes}"
-            end
-          end
+          merge_default_scopes(params) unless skip_default_scopes?
         end
+      end
+
+      def extract_user_data(response)
+        return {} unless response.is_a?(Hash)
+
+        user_data = response['user'] || response
+        user_data.deep_symbolize_keys
+      end
+
+      def skip_default_scopes?
+        options[:authorize_options]&.include?('scope')
+      end
+
+      def merge_default_scopes(params)
+        scope = params['scope'] || params[:scope]
+        params[:scope] = build_scope_string(scope)
+      end
+
+      def build_scope_string(scope)
+        default_scopes = 'public user:read:profile'
+        return default_scopes if scope.nil? || scope.empty?
+        return scope if scope.include?(default_scopes)
+
+        "#{scope} #{default_scopes}"
       end
     end
   end
