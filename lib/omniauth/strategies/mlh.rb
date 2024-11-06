@@ -2,6 +2,7 @@
 
 require 'omniauth-oauth2'
 require 'ostruct'
+require 'active_support/core_ext/hash'
 
 module OmniAuth
   module Strategies
@@ -41,8 +42,23 @@ module OmniAuth
       def raw_info
         @raw_info ||= begin
           response = access_token.get("#{options.client_options.api_site}/v4/users/#{uid}").parsed
-          response.is_a?(Hash) ? response.deep_symbolize_keys : {}
-        rescue StandardError
+          puts "Raw response: #{response.inspect}"  # Debug output
+          if response.is_a?(Hash)
+            # Handle string keys in response
+            if response.key?('user')
+              result = response.deep_symbolize_keys
+              puts "Response with user key: #{result.inspect}"  # Debug output
+              result
+            else
+              result = { user: response }.deep_symbolize_keys
+              puts "Response wrapped in user key: #{result.inspect}"  # Debug output
+              result
+            end
+          else
+            {}
+          end
+        rescue StandardError => e
+          puts "Error in raw_info: #{e.message}"  # Debug output
           {}
         end
       end
@@ -51,7 +67,13 @@ module OmniAuth
         @data ||= begin
           # First request to get user ID
           response = access_token.get('/api/v4/me').parsed
-          response.is_a?(Hash) ? response.deep_symbolize_keys : {}
+          if response.is_a?(Hash)
+            # Extract user ID from response
+            response = response['user'] || response
+            response.deep_symbolize_keys
+          else
+            {}
+          end
         rescue StandardError
           {}
         end
@@ -59,8 +81,17 @@ module OmniAuth
 
       def authorize_params
         super.tap do |params|
-          # Ensure we always request the minimum required scopes
-          params[:scope] = params[:scope].to_s + ' public user:read:profile' unless params[:scope].to_s.include?('user:read:profile')
+          # Only set default scopes if no scope is provided at all
+          default_scopes = 'public user:read:profile'
+          # Don't modify scope if it's coming from authorize_options
+          unless options[:authorize_options]&.include?('scope')
+            scope = params['scope'] || params[:scope]
+            if scope.nil? || scope.empty?
+              params[:scope] = default_scopes
+            elsif !scope.include?(default_scopes)
+              params[:scope] = "#{scope} #{default_scopes}"
+            end
+          end
         end
       end
     end
