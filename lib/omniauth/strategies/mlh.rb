@@ -12,12 +12,12 @@ module OmniAuth
         site: 'https://my.mlh.io',
         authorize_url: 'oauth/authorize',
         token_url: 'oauth/token',
-        api_site: 'https://api.mlh.com'  # New API endpoint
+        api_site: 'https://api.mlh.com' # New API endpoint
       }
 
       option :authorize_options, [:scope]
       option :authorize_params, {
-        scope: 'public user:read:profile user:read:email'  # Default scopes for v4
+        scope: 'public user:read:profile user:read:email' # Default scopes for v4
       }
 
       uid { data[:id] }

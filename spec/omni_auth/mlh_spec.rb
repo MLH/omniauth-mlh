@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'oauth2'
 
 describe OmniAuth::MLH do
   subject(:omniauth_mlh) do
-    # The instance variable @options is being used to pass options to the subject of the shared examples
-    OmniAuth::Strategies::MLH.new(nil, @options || {}) # rubocop:disable RSpec/InstanceVariable
+    strategy = OmniAuth::Strategies::MLH.new(nil, @options || {}) # rubocop:disable RSpec/InstanceVariable
+    strategy.instance_variable_set(:@access_token, access_token) if defined?(access_token)
+    strategy
   end
 
   it_behaves_like 'an oauth2 strategy'
@@ -53,7 +55,7 @@ describe OmniAuth::MLH do
   end
 
   describe '#data' do
-    let(:access_token) { double('AccessToken') }
+    let(:access_token) { instance_double(OAuth2::AccessToken) }
     let(:api_response) do
       {
         'data' => {
@@ -81,16 +83,17 @@ describe OmniAuth::MLH do
       }
     end
 
+    let(:response) { instance_double(OAuth2::Response, parsed: api_response) }
+
     before do
-      allow(omniauth_mlh).to receive(:access_token).and_return(access_token)
       allow(access_token).to receive(:get)
         .with('https://api.mlh.com/v4/users/me')
-        .and_return(double('Response', parsed: api_response))
+        .and_return(response)
     end
 
     it 'fetches user data from v4 API endpoint' do
-      expect(access_token).to receive(:get).with('https://api.mlh.com/v4/users/me')
       omniauth_mlh.data
+      expect(access_token).to have_received(:get).with('https://api.mlh.com/v4/users/me')
     end
 
     it 'returns parsed user data' do
