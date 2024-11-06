@@ -7,14 +7,14 @@ This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy f
 authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
 [register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
 
-It now supports MyMLH API V3. [Read the MyMLH V3 docs here](https://my.mlh.io/docs).
+It supports MyMLH API V4. [Read the MyMLH V4 docs here](https://my.mlh.io/docs).
 
 Once you have done so, you can follow the instructions below:
 
 ## Requirements
 
-This Gem requires your Ruby version to be at least `2.2.0`, which is set
-downstream by [Omniauth](https://github.com/omniauth/omniauth/blob/master/omniauth.gemspec#L22).
+This Gem requires Ruby version 3.2.0 or higher. This requirement is set to ensure compatibility
+with the latest features and security updates.
 
 ## Installation
 
@@ -36,7 +36,8 @@ Or install it yourself as:
 
 ```ruby
 use OmniAuth::Builder do
-  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+          scope: 'user:read:profile user:read:email offline_access'
 end
 ```
 
@@ -46,9 +47,20 @@ end
 # config/devise.rb
 
 Devise.setup do |config|
-  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+                  scope: 'user:read:profile user:read:email offline_access'
 end
 ```
+
+## Available Scopes
+
+The following scopes are available in the v4 API:
+- `user:read:profile` - Access to basic profile information
+- `user:read:email` - Access to email address
+- `user:read:demographics` - Access to demographic information
+- `user:read:education` - Access to education details
+- `user:read:employment` - Access to employment information
+- `offline_access` - Enables refresh token support
 
 ## Contributing
 

@@ -5,7 +5,7 @@ require 'ostruct'
 
 module OmniAuth
   module Strategies
-    class MLH < OmniAuth::Strategies::OAuth2 # :nodoc:
+    class MLH < OmniAuth::Strategies::OAuth2
       option :name, :mlh
 
       option :client_options, {
@@ -14,33 +14,68 @@ module OmniAuth
         token_url: 'oauth/token'
       }
 
-      uid { data[:id] }
+      # Default scope includes user:read:profile and offline_access for refresh tokens
+      option :scope, 'user:read:profile offline_access'
+
+      # Support for expandable fields in the API
+      option :fields, []
+
+      uid { raw_info['id'] }
 
       info do
-        data.slice(
-          :email,
-          :created_at,
-          :updated_at,
-          :first_name,
-          :last_name,
-          :level_of_study,
-          :major,
-          :date_of_birth,
-          :gender,
-          :phone_number,
-          :profession_type,
-          :company_name,
-          :company_title,
-          :scopes,
-          :school
-        )
+        prune!({
+          'email' => raw_info.dig('email'),
+          'first_name' => raw_info.dig('first_name'),
+          'last_name' => raw_info.dig('last_name'),
+          'created_at' => raw_info.dig('created_at'),
+          'updated_at' => raw_info.dig('updated_at'),
+          'roles' => raw_info.dig('roles'),
+          'phone_number' => raw_info.dig('phone_number'),
+          'demographics' => {
+            'gender' => raw_info.dig('demographics', 'gender'),
+            'date_of_birth' => raw_info.dig('demographics', 'date_of_birth')
+          },
+          'education' => {
+            'level' => raw_info.dig('education', 'level'),
+            'major' => raw_info.dig('education', 'major'),
+            'school' => raw_info.dig('education', 'school')
+          },
+          'employment' => {
+            'type' => raw_info.dig('employment', 'type'),
+            'company' => raw_info.dig('employment', 'company'),
+            'title' => raw_info.dig('employment', 'title')
+          }
+        })
       end
 
-      def data
-        @data ||= begin
-          access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data]
-        rescue StandardError
-          {}
+      credentials do
+        hash = { 'token' => access_token.token }
+        hash['refresh_token'] = access_token.refresh_token if access_token.refresh_token
+        hash['expires_at'] = access_token.expires_at if access_token.expires_at
+        hash['expires'] = access_token.expires?
+        hash
+      end
+
+      def raw_info
+        @raw_info ||= begin
+          path = '/v4/users/me'
+          path += "?fields=#{options.fields.join(',')}" if options.fields.any?
+
+          response = access_token.get(path)
+          raise OmniAuth::Error.new(response.error) unless response.success?
+
+          response.parsed
+        rescue StandardError => e
+          raise OmniAuth::Error.new("Failed to get user info: #{e.message}")
+        end
+      end
+
+      private
+
+      def prune!(hash)
+        hash.delete_if do |_, value|
+          prune!(value) if value.is_a?(Hash)
+          value.nil? || (value.respond_to?(:empty?) && value.empty?)
         end
       end
     end
