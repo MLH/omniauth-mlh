@@ -23,6 +23,10 @@ describe OmniAuth::MLH do
       expect(omniauth_mlh.client.options[:token_url]).to eq('oauth/token')
     end
 
+    it 'has correct API site' do
+      expect(omniauth_mlh.options.client_options[:api_site]).to eq('https://api.mlh.com')
+    end
+
     it 'runs the setup block if passed one' do
       counter = ''
       @options = { setup: proc { |_env| counter = 'ok' } }
@@ -34,6 +38,52 @@ describe OmniAuth::MLH do
   describe '#callback_path' do
     it 'has the correct callback path' do
       expect(omniauth_mlh.callback_path).to eq('/auth/mlh/callback')
+    end
+  end
+
+  describe '#authorize_params' do
+    it 'includes default scopes' do
+      expect(omniauth_mlh.authorize_params[:scope]).to eq('public user:read:profile user:read:email')
+    end
+
+    it 'allows overriding default scopes' do
+      @options = { authorize_params: { scope: 'custom_scope' } }
+      expect(omniauth_mlh.authorize_params[:scope]).to eq('custom_scope')
+    end
+  end
+
+  describe '#data' do
+    let(:access_token) { double('AccessToken') }
+    let(:api_response) do
+      {
+        'data' => {
+          'id' => '123',
+          'email' => 'user@example.com',
+          'first_name' => 'John',
+          'last_name' => 'Doe'
+        }
+      }
+    end
+
+    before do
+      allow(omniauth_mlh).to receive(:access_token).and_return(access_token)
+      allow(access_token).to receive(:get)
+        .with('https://api.mlh.com/v4/users/me')
+        .and_return(double('Response', parsed: api_response))
+    end
+
+    it 'fetches user data from v4 API endpoint' do
+      expect(access_token).to receive(:get).with('https://api.mlh.com/v4/users/me')
+      omniauth_mlh.data
+    end
+
+    it 'returns parsed user data' do
+      expect(omniauth_mlh.data).to eq(api_response['data'].transform_keys(&:to_sym))
+    end
+
+    it 'returns empty hash on error' do
+      allow(access_token).to receive(:get).and_raise(StandardError)
+      expect(omniauth_mlh.data).to eq({})
     end
   end
 end
