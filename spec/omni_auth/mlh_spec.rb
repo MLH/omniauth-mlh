@@ -24,8 +24,8 @@ describe OmniAuth::MLH do
       expect(omniauth_mlh.client.options[:token_url]).to eq('oauth/token')
     end
 
-    it 'has correct API site' do
-      expect(omniauth_mlh.options.client_options[:api_site]).to eq('https://api.mlh.com')
+    it 'has correct site for API endpoints' do
+      expect(omniauth_mlh.options.client_options[:site]).to eq('https://my.mlh.io')
     end
 
     it 'runs the setup block if passed one' do
@@ -82,7 +82,7 @@ describe OmniAuth::MLH do
 
     it 'requests the correct API endpoint' do
       omniauth_mlh.raw_info
-      expect(token).to have_received(:get).with('https://api.mlh.com/v4/users/123')
+      expect(token).to have_received(:get).with('https://my.mlh.io/v4/users/123')
     end
 
     it 'returns symbolized response data' do

@@ -41,19 +41,11 @@ module OmniAuth
 
       def raw_info
         @raw_info ||= begin
-          response = access_token.get("#{options.client_options.api_site}/v4/users/#{uid}").parsed
+          response = access_token.get("#{options.client_options.site}/v4/users/#{uid}").parsed
           normalize_response(response)
         rescue StandardError
           {}
         end
-      end
-
-      private
-
-      def normalize_response(response)
-        return {} unless response.is_a?(Hash)
-
-        response.key?('user') ? response.deep_symbolize_keys : { user: response }.deep_symbolize_keys
       end
 
       def data
@@ -69,6 +61,14 @@ module OmniAuth
         super.tap do |params|
           merge_default_scopes(params) unless skip_default_scopes?
         end
+      end
+
+      private
+
+      def normalize_response(response)
+        return {} unless response.is_a?(Hash)
+
+        response.key?('user') ? response.deep_symbolize_keys : { user: response }.deep_symbolize_keys
       end
 
       def extract_user_data(response)
