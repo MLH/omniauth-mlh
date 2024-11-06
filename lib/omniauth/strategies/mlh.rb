@@ -11,36 +11,56 @@ module OmniAuth
       option :client_options, {
         site: 'https://my.mlh.io',
         authorize_url: 'oauth/authorize',
-        token_url: 'oauth/token'
+        token_url: 'oauth/token',
+        api_site: 'https://api.mlh.com'
+      }
+
+      option :authorize_params, {
+        scope: 'public user:read:profile'
       }
 
       uid { data[:id] }
 
       info do
-        data.slice(
-          :email,
-          :created_at,
-          :updated_at,
-          :first_name,
-          :last_name,
-          :level_of_study,
-          :major,
-          :date_of_birth,
-          :gender,
-          :phone_number,
-          :profession_type,
-          :company_name,
-          :company_title,
-          :scopes,
-          :school
-        )
+        {
+          email: raw_info.dig(:user, :email),
+          first_name: raw_info.dig(:user, :first_name),
+          last_name: raw_info.dig(:user, :last_name),
+          created_at: raw_info.dig(:user, :created_at),
+          updated_at: raw_info.dig(:user, :updated_at),
+          demographics: raw_info.dig(:user, :demographics),
+          education: raw_info.dig(:user, :education),
+          employment: raw_info.dig(:user, :employment),
+          event_preferences: raw_info.dig(:user, :event_preferences),
+          address: raw_info.dig(:user, :address),
+          phone_number: raw_info.dig(:user, :phone_number),
+          social_profiles: raw_info.dig(:user, :social_profiles)
+        }
+      end
+
+      def raw_info
+        @raw_info ||= begin
+          response = access_token.get("#{options.client_options.api_site}/v4/users/#{uid}").parsed
+          response.is_a?(Hash) ? response.deep_symbolize_keys : {}
+        rescue StandardError
+          {}
+        end
       end
 
       def data
         @data ||= begin
-          access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data]
+          # First request to get user ID
+          response = access_token.get('/api/v4/me').parsed
+          response.is_a?(Hash) ? response.deep_symbolize_keys : {}
         rescue StandardError
           {}
+        end
+      end
+
+      def authorize_params
+        super.tap do |params|
+          # Ensure we always request the minimum required scopes
+          params[:scope] = params[:scope].to_s + ' public user:read:profile' unless params[:scope].to_s.include?('user:read:profile')
         end
       end
     end
