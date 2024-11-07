@@ -10,14 +10,18 @@ module OmniAuth
 
       option :client_options, {
         site: 'https://my.mlh.io',
-        authorize_url: 'oauth/authorize',
-        token_url: 'oauth/token',
+        authorize_url: 'https://my.mlh.io/oauth/authorize',
+        token_url: 'https://my.mlh.io/oauth/token',
         api_site: 'https://api.mlh.com' # New API endpoint
       }
 
       option :authorize_options, [:scope]
       option :authorize_params, {
         scope: 'public user:read:profile user:read:email' # Default scopes for v4
+      }
+
+      option :auth_token_params, {
+        auth_scheme: :basic_auth # Most OAuth2 providers prefer basic auth for token exchange
       }
 
       uid { data[:id] }

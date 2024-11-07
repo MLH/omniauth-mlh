@@ -18,11 +18,11 @@ describe OmniAuth::MLH do
     end
 
     it 'has correct authorize url' do
-      expect(omniauth_mlh.client.options[:authorize_url]).to eq('oauth/authorize')
+      expect(omniauth_mlh.client.options[:authorize_url]).to eq('https://my.mlh.io/oauth/authorize')
     end
 
     it 'has correct token url' do
-      expect(omniauth_mlh.client.options[:token_url]).to eq('oauth/token')
+      expect(omniauth_mlh.client.options[:token_url]).to eq('https://my.mlh.io/oauth/token')
     end
 
     it 'has correct API site' do
@@ -34,6 +34,56 @@ describe OmniAuth::MLH do
       @options = { setup: proc { |_env| counter = 'ok' } }
       omniauth_mlh.setup_phase
       expect(counter).to eq('ok')
+    end
+  end
+
+  describe '#auth_token_params' do
+    it 'has correct auth scheme' do
+      expect(omniauth_mlh.options.auth_token_params[:auth_scheme]).to eq(:basic_auth)
+    end
+  end
+
+  describe '#callback_phase' do
+    let(:request) { double('Request', params: { 'code' => 'valid_code' }) }
+    let(:client) { instance_double(OAuth2::Client) }
+    let(:auth_code) { instance_double(OAuth2::Strategy::AuthCode) }
+    let(:token) { instance_double(OAuth2::AccessToken) }
+
+    before do
+      allow(omniauth_mlh).to receive(:request).and_return(request)
+      allow(omniauth_mlh).to receive(:client).and_return(client)
+      allow(client).to receive(:auth_code).and_return(auth_code)
+      allow(token).to receive(:token).and_return('valid_token')
+      allow(token).to receive(:expires?).and_return(true)
+      allow(token).to receive(:expires_at).and_return(1234567890)
+      allow(token).to receive(:refresh_token).and_return('refresh_token')
+    end
+
+    context 'when token exchange is successful' do
+      before do
+        allow(auth_code).to receive(:get_token)
+          .with('valid_code', hash_including(redirect_uri: omniauth_mlh.callback_url))
+          .and_return(token)
+      end
+
+      it 'exchanges authorization code for access token' do
+        expect(auth_code).to receive(:get_token)
+          .with('valid_code', hash_including(redirect_uri: omniauth_mlh.callback_url))
+        allow(omniauth_mlh).to receive(:env).and_return({})
+        omniauth_mlh.callback_phase
+      end
+    end
+
+    context 'when token exchange fails' do
+      before do
+        allow(auth_code).to receive(:get_token)
+          .and_raise(OAuth2::Error.new(double('Response', parsed: {}, body: '')))
+      end
+
+      it 'fails with invalid_credentials' do
+        expect(omniauth_mlh).to receive(:fail!).with(:invalid_credentials, instance_of(OAuth2::Error))
+        omniauth_mlh.callback_phase
+      end
     end
   end
 

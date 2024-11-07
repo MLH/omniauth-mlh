@@ -1,0 +1,21 @@
+current directory: /home/ubuntu/omniauth-mlh/vendor/bundle/ruby/3.0.0/gems/json-2.8.1/ext/json/ext/parser
+/usr/bin/ruby3.0 -I /usr/lib/ruby/vendor_ruby -r ./siteconf20241107-13101-q2z5do.rb extconf.rb
+checking for rb_enc_interned_str() in ruby.h... yes
+checking for rb_hash_new_capa() in ruby.h... no
+checking for rb_gc_mark_locations() in ruby.h... yes
+checking for rb_hash_bulk_insert() in ruby.h... yes
+checking for rb_category_warn() in ruby.h... yes
+checking for whether -std=c99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /home/ubuntu/omniauth-mlh/vendor/bundle/ruby/3.0.0/gems/json-2.8.1/ext/json/ext/parser
+make DESTDIR\= clean
+
+current directory: /home/ubuntu/omniauth-mlh/vendor/bundle/ruby/3.0.0/gems/json-2.8.1/ext/json/ext/parser
+make DESTDIR\=
+compiling parser.c
+linking shared-object json/ext/parser.so
+
+current directory: /home/ubuntu/omniauth-mlh/vendor/bundle/ruby/3.0.0/gems/json-2.8.1/ext/json/ext/parser
+make DESTDIR\= install
+/usr/bin/install -c -m 0755 parser.so ./.gem.20241107-13101-w0ger1/json/ext
