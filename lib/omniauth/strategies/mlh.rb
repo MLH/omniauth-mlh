@@ -9,9 +9,9 @@ module OmniAuth
       option :name, :mlh
 
       option :client_options, {
-        site: 'https://my.mlh.io',
+        site: 'https://api.mlh.com/v4',
         authorize_url: 'https://my.mlh.io/oauth/authorize',
-        token_url: 'https://my.mlh.io/oauth/token',
+        token_url: 'https://api.mlh.com/v4/oauth/token',
         api_site: 'https://api.mlh.com' # New API endpoint
       }
 

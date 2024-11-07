@@ -14,7 +14,7 @@ describe OmniAuth::MLH do
 
   describe '#client' do
     it 'has correct MyMLH site' do
-      expect(omniauth_mlh.client.site).to eq('https://my.mlh.io')
+      expect(omniauth_mlh.client.site).to eq('https://api.mlh.com/v4')
     end
 
     it 'has correct authorize url' do
@@ -22,7 +22,7 @@ describe OmniAuth::MLH do
     end
 
     it 'has correct token url' do
-      expect(omniauth_mlh.client.options[:token_url]).to eq('https://my.mlh.io/oauth/token')
+      expect(omniauth_mlh.client.options[:token_url]).to eq('https://api.mlh.com/v4/oauth/token')
     end
 
     it 'has correct API site' do
