@@ -1,10 +1,11 @@
-require: 
+require:
   - rubocop-rspec
   - rubocop-performance
 
 AllCops:
   # Ruby 2.7 is the MINIMUM Ruby version supported
   TargetRubyVersion: '2.7.0'
+  NewCops: enable
   Exclude:
     - vendor/**/*
 
@@ -13,9 +14,9 @@ Style/WordArray:
   EnforcedStyle: brackets
   Enabled: true
 
-Style/SymbolArray: 
+Style/SymbolArray:
   Description: Force symbol arrays to use bracket notation instead of %i
-  EnforcedStyle: brackets 
+  EnforcedStyle: brackets
   Enabled: true
 
 Style/RegexpLiteral:
@@ -23,6 +24,27 @@ Style/RegexpLiteral:
   AllowInnerSlashes: true
   Enabled: true
 
-RSpec/MultipleExpectations: 
-  Description: Allow tests to contain multiple expectations 
+RSpec/MultipleExpectations:
+  Description: Allow tests to contain multiple expectations
+  Enabled: false
+
+# Configure new cops
+Gemspec/RequireMFA:
+  Enabled: false
+
+Style/OpenStructUse:
+  Enabled: false
+
+Performance/MapCompact:
+  Enabled: true
+
+RSpec/StringAsInstanceDoubleConstant:
+  Enabled: true
+
+# Allow more memoized helpers for complex test scenarios
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# Disable development dependencies warning as it's a gem
+Gemspec/DevelopmentDependencies:
   Enabled: false
