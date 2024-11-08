@@ -50,7 +50,10 @@ module OmniAuth
       def raw_info
         @raw_info ||= begin
           fields_param = options.fields.any? ? "?#{Array(options.fields).map { |field| "expand[]=#{field}" }.join('&')}" : ""
-          access_token.get("https://api.mlh.com/v4/users/me#{fields_param}").parsed
+          access_token.get(
+            "https://api.mlh.com/v4/users/me#{fields_param}",
+            headers: { 'Authorization' => "Bearer #{access_token.token}" }
+          ).parsed
         rescue StandardError
           {}
         end
