@@ -11,36 +11,55 @@ module OmniAuth
       option :client_options, {
         site: 'https://my.mlh.io',
         authorize_url: 'oauth/authorize',
-        token_url: 'oauth/token'
+        token_url: 'https://api.mlh.com/v4/oauth/token'
       }
 
-      uid { data[:id] }
+      option :auth_token_params, {
+        mode: :body
+      }
+
+      option :fields, []  # Allow configurable field expansion
+
+      uid { raw_info['id'] }
 
       info do
-        data.slice(
-          :email,
-          :created_at,
-          :updated_at,
-          :first_name,
-          :last_name,
-          :level_of_study,
-          :major,
-          :date_of_birth,
-          :gender,
-          :phone_number,
-          :profession_type,
-          :company_name,
-          :company_title,
-          :scopes,
-          :school
-        )
+        {
+          id: raw_info['id'],
+          email: raw_info['email'],
+          first_name: raw_info['first_name'],
+          last_name: raw_info['last_name'],
+          created_at: raw_info['created_at'],
+          updated_at: raw_info['updated_at'],
+          roles: raw_info['roles'],
+          phone_number: raw_info['phone_number']
+        }
       end
 
-      def data
-        @data ||= begin
-          access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data]
+      extra do
+        {
+          'raw_info' => raw_info,
+          'profile' => raw_info['profile'],
+          'address' => raw_info['address'],
+          'social_profiles' => raw_info['social_profiles'],
+          'professional_experience' => raw_info['professional_experience'],
+          'education' => raw_info['education'],
+          'identifiers' => raw_info['identifiers']
+        }
+      end
+
+      def raw_info
+        @raw_info ||= begin
+          access_token.get('https://api.mlh.com/v4/users/me').parsed
         rescue StandardError
           {}
+        end
+      end
+
+      def authorize_params
+        super.tap do |params|
+          if options.fields.any?
+            params[:expand] = Array(options.fields).join(',')
+          end
         end
       end
     end
