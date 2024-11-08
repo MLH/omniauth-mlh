@@ -49,7 +49,8 @@ module OmniAuth
 
       def raw_info
         @raw_info ||= begin
-          access_token.get('https://api.mlh.com/v4/users/me').parsed
+          fields_param = options.fields.any? ? "?#{Array(options.fields).map { |field| "expand[]=#{field}" }.join('&')}" : ""
+          access_token.get("https://api.mlh.com/v4/users/me#{fields_param}").parsed
         rescue StandardError
           {}
         end
@@ -58,7 +59,7 @@ module OmniAuth
       def authorize_params
         super.tap do |params|
           if options.fields.any?
-            params[:expand] = Array(options.fields).join(',')
+            params[:expand] = Array(options.fields).map { |field| "expand[]=#{field}" }.join('&')
           end
         end
       end
