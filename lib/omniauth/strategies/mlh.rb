@@ -9,9 +9,19 @@ module OmniAuth
       option :name, :mlh
 
       option :client_options, {
-        site: 'https://my.mlh.io',
-        authorize_url: 'oauth/authorize',
-        token_url: 'oauth/token'
+        site: 'https://api.mlh.com/v4',
+        authorize_url: 'https://my.mlh.io/oauth/authorize',
+        token_url: 'https://api.mlh.com/v4/oauth/token',
+        api_site: 'https://api.mlh.com' # New API endpoint
+      }
+
+      option :authorize_options, [:scope]
+      option :authorize_params, {
+        scope: 'public user:read:profile user:read:email' # Default scopes for v4
+      }
+
+      option :auth_token_params, {
+        auth_scheme: :request_body
       }
 
       uid { data[:id] }
@@ -38,7 +48,9 @@ module OmniAuth
 
       def data
         @data ||= begin
-          access_token.get('/api/v3/user.json').parsed.deep_symbolize_keys[:data]
+          api_site = options.client_options[:api_site]
+          response = access_token.get("#{api_site}/v4/users/me").parsed
+          response.deep_symbolize_keys[:data]
         rescue StandardError
           {}
         end

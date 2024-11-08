@@ -20,13 +20,13 @@ Gem::Specification.new do |spec|
 
   spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.files          = `git ls-files`.split("\n")
-  spec.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
   spec.add_dependency 'oauth2', '~> 2.0.9'
   spec.add_dependency 'omniauth', '~> 2.1.1'
   spec.add_dependency 'omniauth-oauth2', '~> 1.8.0'
 
+  spec.add_development_dependency 'activesupport', '~> 7.0'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'rake', '~> 12.3.3'
   spec.add_development_dependency 'rspec', '~> 3.10'

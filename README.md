@@ -7,9 +7,26 @@ This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy f
 authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
 [register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
 
-It now supports MyMLH API V3. [Read the MyMLH V3 docs here](https://my.mlh.io/docs).
+It supports MyMLH API V4. For API documentation, please contact MLH support.
 
 Once you have done so, you can follow the instructions below:
+
+## Breaking Changes in Version 2.0.0
+
+Version 2.0.0 introduces support for MyMLH API V4, which includes several breaking changes:
+
+1. New API Endpoints
+   - The API now uses `https://api.mlh.com` as the base URL
+   - User data is now fetched from `/v4/users/me`
+
+2. Updated Scope System
+   - New granular scope system
+   - Default scopes: `public user:read:profile user:read:email`
+   - The old scope system (e.g., 'default email birthday') is no longer supported
+
+3. Authentication Flow
+   - Only Authorization Code Flow is supported
+   - Implicit Grant Flow has been removed
 
 ## Requirements
 
@@ -21,7 +38,7 @@ downstream by [Omniauth](https://github.com/omniauth/omniauth/blob/master/omniau
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'omniauth-mlh'
+gem 'omniauth-mlh', '~> 2.0'
 ```
 
 And then execute:
@@ -36,7 +53,8 @@ Or install it yourself as:
 
 ```ruby
 use OmniAuth::Builder do
-  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+          scope: 'public user:read:profile user:read:email'
 end
 ```
 
@@ -46,9 +64,29 @@ end
 # config/devise.rb
 
 Devise.setup do |config|
-  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+                 scope: 'public user:read:profile user:read:email'
 end
 ```
+
+## Migration Guide
+
+If you're upgrading from v1.x to v2.0.0:
+
+1. Update your gemfile to use version 2.0.0:
+   ```ruby
+   gem 'omniauth-mlh', '~> 2.0'
+   ```
+
+2. Update your scope configuration:
+   - Old: `scope: 'default email birthday'`
+   - New: `scope: 'public user:read:profile user:read:email'`
+
+3. If you're accessing the API directly:
+   - Update API base URL to `https://api.mlh.com`
+   - Update user endpoint to `/v4/users/me`
+
+4. Test your integration thoroughly as this is a breaking change
 
 ## Contributing
 
