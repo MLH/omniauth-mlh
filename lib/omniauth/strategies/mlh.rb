@@ -21,7 +21,7 @@ module OmniAuth
       }
 
       option :auth_token_params, {
-        auth_scheme: :basic_auth # Most OAuth2 providers prefer basic auth for token exchange
+        auth_scheme: :request_body
       }
 
       uid { data[:id] }
