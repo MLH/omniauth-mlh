@@ -20,7 +20,7 @@ describe OmniAuth::MLH do
     end
 
     it 'has correct token url' do
-      expect(omniauth_mlh.client.options[:token_url]).to eq('oauth/token')
+      expect(omniauth_mlh.client.options[:token_url]).to eq('https://api.mlh.com/v4/oauth/token')
     end
 
     it 'runs the setup block if passed one' do
