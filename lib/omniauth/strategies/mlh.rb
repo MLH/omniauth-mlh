@@ -58,12 +58,6 @@ module OmniAuth
         end
       end
 
-      def authorize_params
-        super.tap do |params|
-          params[:expand] = Array(options.fields).map { |field| "expand[]=#{field}" }.join('&') if options.fields.any?
-        end
-      end
-
       private
 
       def build_fields_param
