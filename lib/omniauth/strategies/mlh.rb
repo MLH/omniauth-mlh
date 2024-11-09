@@ -61,9 +61,10 @@ module OmniAuth
       private
 
       def build_fields_param
-        return '' unless options.fields.any?
+        fields_array = Array(options.fields)
+        return '' if fields_array.empty?
 
-        fields = Array(options.fields).map { |field| "expand[]=#{field}" }
+        fields = fields_array.map { |field| "expand[]=#{field}" }
         "?#{fields.join('&')}"
       end
     end
