@@ -18,7 +18,7 @@ module OmniAuth
         mode: :body
       }
 
-      option :fields, []  # Allow configurable field expansion
+      option :fields, [] # Allow configurable field expansion
 
       uid { raw_info['id'] }
 
@@ -49,9 +49,8 @@ module OmniAuth
 
       def raw_info
         @raw_info ||= begin
-          fields_param = options.fields.any? ? "?#{Array(options.fields).map { |field| "expand[]=#{field}" }.join('&')}" : ""
           access_token.get(
-            "https://api.mlh.com/v4/users/me#{fields_param}",
+            "https://api.mlh.com/v4/users/me#{build_fields_param}",
             headers: { 'Authorization' => "Bearer #{access_token.token}" }
           ).parsed
         rescue StandardError
@@ -61,10 +60,17 @@ module OmniAuth
 
       def authorize_params
         super.tap do |params|
-          if options.fields.any?
-            params[:expand] = Array(options.fields).map { |field| "expand[]=#{field}" }.join('&')
-          end
+          params[:expand] = Array(options.fields).map { |field| "expand[]=#{field}" }.join('&') if options.fields.any?
         end
+      end
+
+      private
+
+      def build_fields_param
+        return '' unless options.fields.any?
+
+        fields = Array(options.fields).map { |field| "expand[]=#{field}" }
+        "?#{fields.join('&')}"
       end
     end
   end
