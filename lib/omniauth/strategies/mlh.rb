@@ -42,29 +42,41 @@ module OmniAuth
       uid { data[:id] }
 
       info do
-        prune_hash(data.slice(
-          :email,          # from user:read:email
-          :first_name,     # from user:read:profile
-          :last_name,      # from user:read:profile
-          :demographics,   # from user:read:demographics
-          :education,      # from user:read:education
-          :phone_number,   # from user:read:phone
-          :address,        # from user:read:address
-          :birthday,       # from user:read:birthday
-          :employment,     # from user:read:employment
-          :event_preferences, # from user:read:event_preferences
-          :social_profiles   # from user:read:social_profiles
-        ))
+        prune_hash({
+          # Basic fields
+          id: data[:id],
+          created_at: data[:created_at],
+          updated_at: data[:updated_at],
+          first_name: data[:first_name],
+          last_name: data[:last_name],
+          email: data[:email],
+          phone_number: data[:phone_number],
+          roles: data[:roles],
+
+          # Expandable fields
+          profile: data[:profile],
+          address: data[:address],
+          social_profiles: data[:social_profiles],
+          professional_experience: data[:professional_experience],
+          education: data[:education],
+          identifiers: data[:identifiers]
+        })
       end
 
       def data
         @data ||= begin
           # Support expandable fields through options
-          expand_query = options[:expand_fields].map { |f| "expand[]=#{f}" }.join('&')
+          expand_fields = options[:expand_fields] || []
+          expand_query = expand_fields.map { |f| "expand[]=#{f}" }.join('&')
           url = "https://api.mlh.com/v4/users/me"
-          url += "?#{expand_query}" unless options[:expand_fields].empty?
+          url += "?#{expand_query}" unless expand_fields.empty?
 
-          access_token.get(url).parsed.deep_symbolize_keys[:data]
+          response = access_token.get(url).parsed
+          data = response.deep_symbolize_keys[:data]
+
+          # Ensure all fields are properly symbolized, including nested arrays
+          data = symbolize_nested_arrays(data) if data.is_a?(Hash)
+          data || {}
         rescue StandardError
           {}
         end
@@ -74,6 +86,19 @@ module OmniAuth
 
       def prune_hash(hash)
         hash.reject { |_, v| v.nil? }
+      end
+
+      def symbolize_nested_arrays(hash)
+        hash.each_with_object({}) do |(key, value), result|
+          result[key] = case value
+                       when Hash
+                         symbolize_nested_arrays(value)
+                       when Array
+                         value.map { |item| item.is_a?(Hash) ? symbolize_nested_arrays(item) : item }
+                       else
+                         value
+                       end
+        end
       end
     end
   end
