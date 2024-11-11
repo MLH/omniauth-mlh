@@ -54,12 +54,136 @@ RSpec.describe OmniAuth::Strategies::MLH do
           .and_return(double(parsed: { 'data' => {} }))
         expect(subject.data).to eq({})
       end
+
+      it 'correctly handles complex nested arrays and hashes' do
+        raw_response = {
+          'data' => {
+            'id' => 'test-id',
+            'education' => [
+              {
+                'school' => {
+                  'name' => 'Test University',
+                  'location' => 'Test City'
+                },
+                'graduation_year' => 2024
+              }
+            ],
+            'social_profiles' => [
+              { 'platform' => 'github', 'url' => 'https://github.com' },
+              'https://twitter.com'  # Mixed array with hash and string
+            ],
+            'professional_experience' => [
+              {
+                'company' => 'Tech Corp',
+                'positions' => [
+                  { 'title' => 'Engineer', 'years' => [2022, 2023] }
+                ]
+              }
+            ]
+          }
+        }
+
+        oauth_response = double('Response')
+        allow(oauth_response).to receive(:parsed).and_return(raw_response)
+        allow(access_token).to receive(:get)
+          .with('https://api.mlh.com/v4/users/me')
+          .and_return(oauth_response)
+
+        result = subject.data
+        expect(result).to be_a(Hash)
+        expect(result[:education].first[:school]).to eq({ name: 'Test University', location: 'Test City' })
+        expect(result[:social_profiles]).to eq([{ platform: 'github', url: 'https://github.com' }, 'https://twitter.com'])
+        expect(result[:professional_experience].first[:positions].first[:years]).to eq([2022, 2023])
+      end
+
+      it 'correctly handles hash pruning with nil values' do
+        raw_response = {
+          'data' => {
+            'id' => 'test-id',
+            'first_name' => 'Jane',
+            'last_name' => nil,
+            'profile' => {
+              'age' => 22,
+              'gender' => nil,
+              'location' => {
+                'city' => nil,
+                'country' => 'USA'
+              }
+            },
+            'education' => nil
+          }
+        }
+
+        oauth_response = double('Response')
+        allow(oauth_response).to receive(:parsed).and_return(raw_response)
+        allow(access_token).to receive(:get)
+          .with('https://api.mlh.com/v4/users/me')
+          .and_return(oauth_response)
+
+        result = subject.data
+        expect(result).to be_a(Hash)
+        expect(result[:last_name]).to be_nil
+        expect(result[:profile][:gender]).to be_nil
+        expect(result[:profile][:location]).to eq({ city: nil, country: 'USA' })
+        expect(result[:education]).to be_nil
+      end
+
+      it 'correctly handles completely empty hashes' do
+        raw_response = {
+          'data' => {
+            'id' => 'test-id',
+            'profile' => {},
+            'education' => {
+              'schools' => {},
+              'degrees' => []
+            },
+            'social_profiles' => {
+              'github' => {},
+              'linkedin' => {}
+            }
+          }
+        }
+
+        oauth_response = double('Response')
+        allow(oauth_response).to receive(:parsed).and_return(raw_response)
+        allow(access_token).to receive(:get)
+          .with('https://api.mlh.com/v4/users/me')
+          .and_return(oauth_response)
+
+        result = subject.data
+        expect(result).to be_a(Hash)
+        expect(result[:profile]).to eq({})
+        expect(result[:education]).to eq({ schools: {}, degrees: [] })
+        expect(result[:social_profiles]).to eq({ github: {}, linkedin: {} })
+      end
     end
 
     context 'with API error' do
       it 'returns empty hash on error' do
         allow(access_token).to receive(:get).and_raise(StandardError)
         expect(subject.data).to eq({})
+      end
+    end
+  end
+
+  describe '#uid' do
+    context 'with valid data' do
+      before do
+        allow(subject).to receive(:data).and_return({ id: 'test-123' })
+      end
+
+      it 'returns the id from the data hash' do
+        expect(subject.uid).to eq('test-123')
+      end
+    end
+
+    context 'with missing id' do
+      before do
+        allow(subject).to receive(:data).and_return({})
+      end
+
+      it 'returns nil when id is not present' do
+        expect(subject.uid).to be_nil
       end
     end
   end
