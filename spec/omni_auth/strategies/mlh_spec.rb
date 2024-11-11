@@ -39,6 +39,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'constructs the correct URL with expand parameters' do
         strategy.data
+
         expect(access_token).to have_received(:get).with(expand_url)
       end
 
@@ -59,6 +60,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'correctly parses nested profile data' do
         result = strategy.data
+
         expect(result).to be_a(Hash)
         expect(result[:profile]).to eq({ age: 22, gender: 'Female' })
       end
@@ -96,6 +98,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'correctly processes complex nested structures' do
         result = strategy.data
+
         expect(result).to be_a(Hash)
         expect(result[:education].first[:school]).to eq({ name: 'Test University', location: 'Test City' })
         expect(result[:social_profiles]).to eq([{ platform: 'github', url: 'https://github.com' }, 'https://twitter.com'])
@@ -125,6 +128,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'handles nil values correctly' do
         result = strategy.data
+
         expect(result[:last_name]).to be_nil
         expect(result[:profile][:gender]).to be_nil
         expect(result[:profile][:location]).to eq({ city: nil, country: 'USA' })
@@ -133,6 +137,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'handles empty hash structures' do
         result = strategy.data
+
         expect(result[:social_profiles]).to eq({ github: {}, linkedin: {} })
       end
     end
