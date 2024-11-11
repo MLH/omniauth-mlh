@@ -42,29 +42,29 @@ module OmniAuth
       uid { data[:id] }
 
       info do
-        prune_hash({
-                     # Basic fields
-                     id: data[:id],
-                     created_at: data[:created_at],
-                     updated_at: data[:updated_at],
-                     first_name: data[:first_name],
-                     last_name: data[:last_name],
-                     email: data[:email],
-                     phone_number: data[:phone_number],
-                     roles: data[:roles],
+        {
+          # Basic fields
+          id: data[:id],
+          created_at: data[:created_at],
+          updated_at: data[:updated_at],
+          first_name: data[:first_name],
+          last_name: data[:last_name],
+          email: data[:email],
+          phone_number: data[:phone_number],
+          roles: data[:roles],
 
-                     # Expandable fields
-                     profile: data[:profile],
-                     address: data[:address],
-                     social_profiles: data[:social_profiles],
-                     professional_experience: data[:professional_experience],
-                     education: data[:education],
-                     identifiers: data[:identifiers]
-                   })
+          # Expandable fields
+          profile: data[:profile],
+          address: data[:address],
+          social_profiles: data[:social_profiles],
+          professional_experience: data[:professional_experience],
+          education: data[:education],
+          identifiers: data[:identifiers]
+        }
       end
 
       def data
-        @data ||= fetch_and_process_data
+        @data ||= fetch_and_process_data.compact
       rescue StandardError
         {}
       end
@@ -86,10 +86,6 @@ module OmniAuth
 
         expand_query = expand_fields.map { |f| "expand[]=#{f}" }.join('&')
         "#{url}?#{expand_query}"
-      end
-
-      def prune_hash(hash)
-        hash.reject { |_, v| v.nil? }
       end
 
       def symbolize_nested_arrays(hash)
