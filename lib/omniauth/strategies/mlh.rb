@@ -64,25 +64,29 @@ module OmniAuth
       end
 
       def data
-        @data ||= begin
-          # Support expandable fields through options
-          expand_fields = options[:expand_fields] || []
-          expand_query = expand_fields.map { |f| "expand[]=#{f}" }.join('&')
-          url = 'https://api.mlh.com/v4/users/me'
-          url += "?#{expand_query}" unless expand_fields.empty?
-
-          response = access_token.get(url).parsed
-          data = response.deep_symbolize_keys[:data]
-
-          # Ensure all fields are properly symbolized, including nested arrays
-          data = symbolize_nested_arrays(data) if data.is_a?(Hash)
-          data || {}
-        rescue StandardError
-          {}
-        end
+        @data ||= fetch_and_process_data
+      rescue StandardError
+        {}
       end
 
       private
+
+      def fetch_and_process_data
+        response = access_token.get(build_api_url).parsed
+        data = response.deep_symbolize_keys[:data]
+        return {} unless data.is_a?(Hash)
+
+        symbolize_nested_arrays(data)
+      end
+
+      def build_api_url
+        url = 'https://api.mlh.com/v4/users/me'
+        expand_fields = options[:expand_fields] || []
+        return url if expand_fields.empty?
+
+        expand_query = expand_fields.map { |f| "expand[]=#{f}" }.join('&')
+        "#{url}?#{expand_query}"
+      end
 
       def prune_hash(hash)
         hash.reject { |_, v| v.nil? }
