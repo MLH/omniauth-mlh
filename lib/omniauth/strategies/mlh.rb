@@ -74,9 +74,9 @@ module OmniAuth
       def fetch_and_process_data
         response = access_token.get(build_api_url)
         data = JSON.parse(response.body, symbolize_names: true)
-        return {} unless data.is_a?(Hash)
+        return {} unless data.is_a?(Hash) && data[:data].is_a?(Hash)
 
-        symbolize_nested_arrays(data)
+        symbolize_nested_arrays(data[:data])
       end
 
       def build_api_url

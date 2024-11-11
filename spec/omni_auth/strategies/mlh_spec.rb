@@ -13,7 +13,11 @@ RSpec.describe OmniAuth::Strategies::MLH do
   end
 
   shared_context 'with oauth response' do |response_data|
-    let(:oauth_response) { instance_double(OAuth2::Response, parsed: { 'data' => response_data }) }
+    let(:oauth_response) do
+      instance_double(OAuth2::Response,
+                     body: { 'data' => response_data }.to_json,
+                     parsed: { 'data' => response_data })
+    end
     before do
       allow(access_token).to receive(:get)
         .with('https://api.mlh.com/v4/users/me')
@@ -23,7 +27,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
   describe '#data' do
     context 'with expandable fields' do
-      let(:response) { instance_double(OAuth2::Response, parsed: { 'data' => {} }) }
+      let(:response) { instance_double(OAuth2::Response, body: { 'data' => {} }.to_json, parsed: { 'data' => {} }) }
       let(:expand_url) { 'https://api.mlh.com/v4/users/me?expand[]=profile&expand[]=education' }
 
       before do
