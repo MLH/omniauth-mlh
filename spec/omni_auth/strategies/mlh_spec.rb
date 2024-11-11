@@ -145,6 +145,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
     context 'with API error' do
       it 'returns empty hash on error' do
         allow(access_token).to receive(:get).and_raise(StandardError)
+
         expect(strategy.data).to eq({})
       end
     end
@@ -152,21 +153,15 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
   describe '#uid' do
     context 'with valid data' do
-      before do
-        allow(strategy).to receive(:data).and_return({ id: 'test-123' })
-      end
-
       it 'returns the id from the data hash' do
+        allow(strategy).to receive(:data).and_return({ id: 'test-123' })
         expect(strategy.uid).to eq('test-123')
       end
     end
 
     context 'with missing id' do
-      before do
-        allow(strategy).to receive(:data).and_return({})
-      end
-
       it 'returns nil when id is not present' do
+        allow(strategy).to receive(:data).and_return({})
         expect(strategy.uid).to be_nil
       end
     end
