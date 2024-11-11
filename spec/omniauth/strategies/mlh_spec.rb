@@ -1,23 +1,25 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe OmniAuth::Strategies::MLH do
-  let(:app) { lambda { |_env| [200, {}, ['Hello.']] } }
-  let(:access_token) { instance_double('AccessToken', options: {}) }
+  let(:strategy) { described_class.new(app, 'client_id', 'client_secret') }
 
-  subject { described_class.new(app, 'client_id', 'client_secret') }
+  let(:app) { ->(_env) { [200, {}, ['Hello.']] } }
+  let(:access_token) { instance_double(OAuth2::AccessToken, options: {}) }
 
   before do
-    allow(subject).to receive(:access_token).and_return(access_token)
+    allow(strategy).to receive(:access_token).and_return(access_token)
   end
 
   describe '#data' do
     context 'with v4 API response' do
       it 'correctly handles expandable fields' do
-        allow(subject).to receive(:options).and_return(expand_fields: ['profile', 'education'])
+        allow(strategy).to receive(:options).and_return(expand_fields: ['profile', 'education'])
         expect(access_token).to receive(:get)
           .with('https://api.mlh.com/v4/users/me?expand[]=profile&expand[]=education')
           .and_return(double(parsed: { 'data' => {} }))
-        subject.data
+        strategy.data
       end
 
       it 'correctly parses nested profile data' do
@@ -43,7 +45,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
           .and_return(oauth_response)
 
         # Test the processed result
-        result = subject.data
+        result = strategy.data
         expect(result).to be_a(Hash)
         expect(result[:profile]).to eq({ age: 22, gender: 'Female' })
       end
@@ -52,7 +54,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
         allow(access_token).to receive(:get)
           .with('https://api.mlh.com/v4/users/me')
           .and_return(double(parsed: { 'data' => {} }))
-        expect(subject.data).to eq({})
+        expect(strategy.data).to eq({})
       end
 
       it 'correctly handles complex nested arrays and hashes' do
@@ -70,7 +72,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
             ],
             'social_profiles' => [
               { 'platform' => 'github', 'url' => 'https://github.com' },
-              'https://twitter.com'  # Mixed array with hash and string
+              'https://twitter.com' # Mixed array with hash and string
             ],
             'professional_experience' => [
               {
@@ -89,7 +91,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
           .with('https://api.mlh.com/v4/users/me')
           .and_return(oauth_response)
 
-        result = subject.data
+        result = strategy.data
         expect(result).to be_a(Hash)
         expect(result[:education].first[:school]).to eq({ name: 'Test University', location: 'Test City' })
         expect(result[:social_profiles]).to eq([{ platform: 'github', url: 'https://github.com' }, 'https://twitter.com'])
@@ -120,7 +122,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
           .with('https://api.mlh.com/v4/users/me')
           .and_return(oauth_response)
 
-        result = subject.data
+        result = strategy.data
         expect(result).to be_a(Hash)
         expect(result[:last_name]).to be_nil
         expect(result[:profile][:gender]).to be_nil
@@ -150,7 +152,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
           .with('https://api.mlh.com/v4/users/me')
           .and_return(oauth_response)
 
-        result = subject.data
+        result = strategy.data
         expect(result).to be_a(Hash)
         expect(result[:profile]).to eq({})
         expect(result[:education]).to eq({ schools: {}, degrees: [] })
@@ -161,7 +163,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
     context 'with API error' do
       it 'returns empty hash on error' do
         allow(access_token).to receive(:get).and_raise(StandardError)
-        expect(subject.data).to eq({})
+        expect(strategy.data).to eq({})
       end
     end
   end
@@ -169,21 +171,21 @@ RSpec.describe OmniAuth::Strategies::MLH do
   describe '#uid' do
     context 'with valid data' do
       before do
-        allow(subject).to receive(:data).and_return({ id: 'test-123' })
+        allow(strategy).to receive(:data).and_return({ id: 'test-123' })
       end
 
       it 'returns the id from the data hash' do
-        expect(subject.uid).to eq('test-123')
+        expect(strategy.uid).to eq('test-123')
       end
     end
 
     context 'with missing id' do
       before do
-        allow(subject).to receive(:data).and_return({})
+        allow(strategy).to receive(:data).and_return({})
       end
 
       it 'returns nil when id is not present' do
-        expect(subject.uid).to be_nil
+        expect(strategy.uid).to be_nil
       end
     end
   end
@@ -199,11 +201,11 @@ RSpec.describe OmniAuth::Strategies::MLH do
     end
 
     before do
-      allow(subject).to receive(:data).and_return(user_data)
+      allow(strategy).to receive(:data).and_return(user_data)
     end
 
     it 'includes all required v4 fields' do
-      expect(subject.info).to include(
+      expect(strategy.info).to include(
         first_name: 'Jane',
         last_name: 'Hacker',
         email: 'jane@example.com',
