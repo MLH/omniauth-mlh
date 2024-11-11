@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'bundler/setup'
 require 'webmock/rspec'
@@ -18,7 +20,7 @@ require 'omniauth-oauth2'
 require 'omniauth_mlh'
 require 'omniauth/strategies/mlh'
 
-Dir[File.expand_path('support/**/*.rb', __dir__)].each { |f| require f }
+Dir[File.expand_path('support/**/*.rb', __dir__)].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|

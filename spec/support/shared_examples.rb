@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'basic data retrieval tests' do
   context 'with successful API response' do
     before do
@@ -18,16 +20,16 @@ end
 RSpec.shared_examples 'expandable fields tests' do
   let(:expanded_user_data) do
     base_user_data.merge({
-      'profile' => {
-        'age' => 22,
-        'gender' => 'Female'
-      },
-      'education' => [{
-        'current' => true,
-        'school_name' => 'Hacker University',
-        'major' => 'Computer Science'
-      }]
-    })
+                           'profile' => {
+                             'age' => 22,
+                             'gender' => 'Female'
+                           },
+                           'education' => [{
+                             'current' => true,
+                             'school_name' => 'Hacker University',
+                             'major' => 'Computer Science'
+                           }]
+                         })
   end
 
   context 'with expandable fields' do
