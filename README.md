@@ -51,6 +51,21 @@ Devise.setup do |config|
 end
 ```
 
+## Accessing User Data
+Once a user has been authorized and you have received a token in your callback, you may access the scoped information for that user via the info key on the request data, as per the below example from a simple Sinatra app:
+
+```ruby
+get '/auth/mlh/callback' do
+  auth = request.env['omniauth.auth']
+  user_data = auth['info']
+  first_name = user_data['first_name']
+  erb "
+    <h1>Hello #{first_name}</h1>"
+end
+```
+
+You can find the full User object in the [docs](https://my.mlh.io/developers/docs).
+
 ## Contributing
 
 For guidance on setting up a development environment and how to make a contribution to omniauth-mlh, see the [contributing guidelines](https://github.com/MLH/omniauth-mlh/blob/main/CONTRIBUTING.md).
