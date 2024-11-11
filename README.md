@@ -37,7 +37,9 @@ You can find a list of potential scopes and expandable fields in the [docs](http
 
 ```ruby
 use OmniAuth::Builder do
-  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'public offline_access user:read:profile', expand_fields: ['education']
+  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+    scope: 'public offline_access user:read:profile',
+    expand_fields: ['education']
 end
 ```
 
@@ -47,7 +49,9 @@ end
 # config/devise.rb
 
 Devise.setup do |config|
-  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'public offline_access user:read:profile', expand_fields: ['education']
+  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+    scope: 'public offline_access user:read:profile',
+    expand_fields: ['education']
 end
 ```
 
