@@ -1,46 +1,84 @@
 # frozen_string_literal: true
 
-# Credit: https://github.com/datariot/omniauth-paypal/blob/master/spec/support/shared_examples.rb
-# NOTE it would be useful if this lived in omniauth-oauth2 eventually
+RSpec.shared_examples 'basic data retrieval tests' do
+  context 'with successful API response' do
+    before do
+      allow(access_token).to receive(:get)
+        .with('https://api.mlh.com/v4/users/me')
+        .and_return(instance_double(OAuth2::Response, parsed: { 'data' => base_user_data }))
+    end
 
-shared_examples 'an oauth2 strategy' do
-  describe '#client' do
-    it 'is initialized with symbolized client_options' do
-      @options = { client_options: { 'authorize_url' => 'https://example.com' } }
-
-      expect(subject.client.options[:authorize_url]).to eq('https://example.com')
+    it 'returns symbolized user data' do
+      expect(strategy.data).to include(
+        id: 'c2ac35c6-aa8c-11ed-afa1-0242ac120002',
+        first_name: 'Jane'
+      )
     end
   end
+end
 
-  describe '#authorize_params' do
-    it 'includes any authorize params passed in the :authorize_params option' do
-      @options = { authorize_params: { foo: 'bar', baz: 'zip' } }
-
-      expect(subject.authorize_params['foo']).to eq('bar')
-      expect(subject.authorize_params['baz']).to eq('zip')
-    end
-
-    it 'includes top-level options that are marked as :authorize_options' do
-      @options = { authorize_options: ['scope', 'foo'], scope: 'bar', foo: 'baz' }
-
-      expect(subject.authorize_params['scope']).to eq('bar')
-      expect(subject.authorize_params['foo']).to eq('baz')
-    end
+RSpec.shared_examples 'expandable fields tests' do
+  let(:expanded_user_data) do
+    base_user_data.merge(
+      'profile' => {
+        'age' => 22,
+        'gender' => 'Female'
+      },
+      'education' => [{
+        'current' => true,
+        'school_name' => 'Hacker University',
+        'major' => 'Computer Science'
+      }]
+    )
   end
 
-  describe '#token_params' do
-    it 'includes any token params passed in the :token_params option' do
-      @options = { token_params: { foo: 'bar', baz: 'zip' } }
-
-      expect(subject.token_params['foo']).to eq('bar')
-      expect(subject.token_params['baz']).to eq('zip')
+  context 'with expandable fields' do
+    before do
+      allow(access_token).to receive(:get)
+        .with('https://api.mlh.com/v4/users/me?expand[]=profile&expand[]=education')
+        .and_return(instance_double(OAuth2::Response, parsed: { 'data' => expanded_user_data }))
+      allow(strategy).to receive(:options).and_return(expand_fields: ['profile', 'education'])
     end
 
-    it 'includes top-level options that are marked as :token_options' do
-      @options = { token_options: [:scope, :foo], scope: 'bar', foo: 'baz' }
-
-      expect(subject.token_params['scope']).to eq('bar')
-      expect(subject.token_params['foo']).to eq('baz')
+    it 'fetches expanded fields' do
+      expect(strategy.data).to include(
+        profile: include(age: 22),
+        education: include(hash_including(school_name: 'Hacker University'))
+      )
     end
+  end
+end
+
+RSpec.shared_examples 'error handling tests' do
+  context 'when API returns error' do
+    before do
+      allow(access_token).to receive(:get).and_raise(StandardError)
+    end
+
+    it 'returns empty hash on error' do
+      expect(strategy.data).to eq({})
+    end
+  end
+end
+
+RSpec.shared_examples 'info hash tests' do
+  let(:user_info) do
+    {
+      id: 'c2ac35c6-aa8c-11ed-afa1-0242ac120002',
+      first_name: 'Jane',
+      last_name: 'Hacker',
+      email: 'jane.hacker@example.com'
+    }
+  end
+
+  before do
+    allow(strategy).to receive(:data).and_return(user_info)
+  end
+
+  it 'returns formatted info hash' do
+    expect(strategy.info).to include(
+      name: 'Jane Hacker',
+      email: 'jane.hacker@example.com'
+    )
   end
 end

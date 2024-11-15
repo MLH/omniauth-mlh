@@ -4,17 +4,16 @@
 [![Test](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml/badge.svg)](https://github.com/MLH/omniauth-mlh/actions/workflows/test.yml)
 
 This is the official [OmniAuth](https://github.com/omniauth/omniauth) strategy for
-authenticating with [MyMLH](https://my.mlh.io). To use it, you'll need to
-[register an application](https://my.mlh.io/oauth/applications) and obtain a OAuth Application ID and Secret from MyMLH.
+authenticating with [MyMLH](https://my.mlh.io) in Ruby applications. To use it, you'll need to
+[register an application](https://my.mlh.io/developers) and obtain a OAuth Application ID and Secret from MyMLH.
 
-It now supports MyMLH API V3. [Read the MyMLH V3 docs here](https://my.mlh.io/docs).
+It now supports MyMLH API V4. [Read the MyMLH V4 docs here](https://my.mlh.io/developers/docs).
 
 Once you have done so, you can follow the instructions below:
 
 ## Requirements
 
-This Gem requires your Ruby version to be at least `2.2.0`, which is set
-downstream by [Omniauth](https://github.com/omniauth/omniauth/blob/master/omniauth.gemspec#L22).
+This Gem requires your Ruby version to be at least `3.2.0`.
 
 ## Installation
 
@@ -34,9 +33,13 @@ Or install it yourself as:
 
 ## Usage (Rack)
 
+You can find a list of potential scopes and expandable fields in the [docs](https://my.mlh.io/developers/docs). The below defaults are provided simply as an example.
+
 ```ruby
 use OmniAuth::Builder do
-  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+    scope: 'public offline_access user:read:profile',
+    expand_fields: ['education']
 end
 ```
 
@@ -46,9 +49,26 @@ end
 # config/devise.rb
 
 Devise.setup do |config|
-  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'], scope: 'default email birthday'
+  config.provider :mlh, ENV['MY_MLH_KEY'], ENV['MY_MLH_SECRET'],
+    scope: 'public offline_access user:read:profile',
+    expand_fields: ['education']
 end
 ```
+
+## Accessing User Data
+Once a user has been authorized and you have received a token in your callback, you may access the scoped information for that user via the info key on the request data, as per the below example from a simple Sinatra app:
+
+```ruby
+get '/auth/mlh/callback' do
+  auth = request.env['omniauth.auth']
+  user_data = auth['info']
+  first_name = user_data['first_name']
+  erb "
+    <h1>Hello #{first_name}</h1>"
+end
+```
+
+You can find the full User object in the [docs](https://my.mlh.io/developers/docs).
 
 ## Contributing
 
@@ -61,6 +81,6 @@ We used part of [datariot/omniauth-paypal](http://github.com/datariot/omniauth-p
 ## Questions?
 
 Have a question about the API or this library? Start by checking out the
-[official MyMLH documentation](https://my.mlh.io/docs). If you still can't
+[official MyMLH documentation](https://my.mlh.io/developers/docs). If you still can't
 find an answer, tweet at [@MLHacks](http://twitter.com/mlhacks) or drop an
 email to [engineering@mlh.io](mailto:engineering@mlh.io).
