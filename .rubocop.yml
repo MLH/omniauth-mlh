@@ -7,6 +7,8 @@ AllCops:
   TargetRubyVersion: '2.7.0'
   Exclude:
     - vendor/**/*
+  NewCops: disable
+  SuggestExtensions: false
 
 Style/WordArray:
   Description: Force arrays of words to use bracket notation instead of %w
@@ -26,3 +28,7 @@ Style/RegexpLiteral:
 RSpec/MultipleExpectations: 
   Description: Allow tests to contain multiple expectations 
   Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - lib/omniauth-mlh.rb

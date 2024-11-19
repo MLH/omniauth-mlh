@@ -17,7 +17,7 @@ end
 
 require 'omniauth'
 require 'omniauth-oauth2'
-require 'omniauth_mlh'
+require 'omniauth-mlh'
 require 'omniauth/strategies/mlh'
 
 Dir[File.expand_path('support/**/*.rb', __dir__)].sort.each { |f| require f }

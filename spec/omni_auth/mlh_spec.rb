@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe OmniAuth::MLH do
   it 'has a version number' do
     expect(OmniAuth::MLH::VERSION).not_to be_nil
-    expect(OmniAuth::MLH::VERSION).to eq('4.0.1')
+    expect(OmniAuth::MLH::VERSION).to eq('4.0.2')
   end
 
   it 'loads the MLH strategy' do
