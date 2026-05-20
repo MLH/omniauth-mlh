@@ -12,6 +12,13 @@ RSpec.describe OmniAuth::Strategies::MLH do
     allow(strategy).to receive(:access_token).and_return(access_token)
   end
 
+  describe 'client options' do
+    it 'uses the current MLH OAuth authorize and token endpoints' do
+      expect(strategy.options.client_options.authorize_url).to eq('https://www.mlh.com/oauth/authorize')
+      expect(strategy.options.client_options.token_url).to eq('https://api.mlh.com/v4/oauth/token')
+    end
+  end
+
   shared_context 'with oauth response' do |response_data|
     let(:oauth_response) do
       instance_double(OAuth2::Response,

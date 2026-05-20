@@ -30,9 +30,9 @@ module OmniAuth
       option :name, :mlh
 
       option :client_options, {
-        site: 'https://my.mlh.io',
-        authorize_url: 'oauth/authorize',
-        token_url: 'oauth/token',
+        site: 'https://www.mlh.com',
+        authorize_url: 'https://www.mlh.com/oauth/authorize',
+        token_url: 'https://api.mlh.com/v4/oauth/token',
         auth_scheme: :request_body # Change from basic auth to request body
       }
 
