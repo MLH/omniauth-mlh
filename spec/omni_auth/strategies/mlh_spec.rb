@@ -14,7 +14,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
   describe 'client options' do
     it 'uses the current MLH OAuth authorize and token endpoints' do
-      expect(strategy.options.client_options.authorize_url).to eq('https://www.mlh.com/oauth/authorize')
+      expect(strategy.options.client_options.authorize_url).to eq('/oauth/authorize')
       expect(strategy.options.client_options.token_url).to eq('https://api.mlh.com/v4/oauth/token')
     end
   end
