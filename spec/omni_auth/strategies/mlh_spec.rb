@@ -17,6 +17,31 @@ RSpec.describe OmniAuth::Strategies::MLH do
       expect(strategy.options.client_options.authorize_url).to eq('/oauth/authorize')
       expect(strategy.options.client_options.token_url).to eq('https://api.mlh.com/v4/oauth/token')
     end
+
+    context 'with only api_site overridden' do
+      let(:strategy) do
+        described_class.new(app, 'client_id', 'client_secret',
+                            client_options: { api_site: 'https://api.mlh.test' })
+      end
+
+      let(:token_request) do
+        stub_request(:post, 'https://api.mlh.com/v4/oauth/token')
+          .with(body: hash_including('client_id' => 'client_id', 'client_secret' => 'client_secret',
+                                     'code' => 'authorization-code', 'grant_type' => 'authorization_code'))
+          .to_return(body: { access_token: 'test-token', token_type: 'Bearer' }.to_json,
+                     headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'preserves the OAuth authorization endpoint' do
+        expect(strategy.client.authorize_url).to eq('https://www.mlh.com/oauth/authorize')
+      end
+
+      it 'exchanges a code at the default token endpoint with credentials in the request body' do
+        token_request
+        expect(strategy.client.auth_code.get_token('authorization-code').token).to eq('test-token')
+        expect(token_request).to have_been_requested
+      end
+    end
   end
 
   shared_context 'with oauth response' do |response_data|
@@ -25,6 +50,7 @@ RSpec.describe OmniAuth::Strategies::MLH do
                       body: response_data.to_json,
                       parsed: response_data)
     end
+
     before do
       allow(access_token).to receive(:get)
         .with('https://api.mlh.com/v4/users/me')
@@ -33,6 +59,21 @@ RSpec.describe OmniAuth::Strategies::MLH do
   end
 
   describe '#data' do
+    [nil, false].each do |expand_fields|
+      context "with expand_fields set to #{expand_fields.inspect}" do
+        let(:strategy) do
+          described_class.new(app, 'client_id', 'client_secret', expand_fields: expand_fields)
+        end
+
+        include_context 'with oauth response', { 'id' => 'core-user-1' }
+
+        it 'fetches user data without expansion parameters' do
+          expect(strategy.data).to eq(id: 'core-user-1')
+          expect(access_token).to have_received(:get).with('https://api.mlh.com/v4/users/me')
+        end
+      end
+    end
+
     context 'with expandable fields' do
       let(:response) do
         instance_double(OAuth2::Response, body: {}.to_json, parsed: {})
@@ -78,6 +119,30 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
       it 'returns an empty hash for empty data' do
         expect(strategy.data).to eq({})
+      end
+    end
+
+    context 'with a custom api_site client option' do
+      let(:custom_strategy) do
+        described_class.new(app, 'client_id', 'client_secret',
+                            client_options: { api_site: 'https://api.mlh.test' })
+      end
+
+      let(:response) do
+        instance_double(OAuth2::Response, body: { 'id' => 'core-user-1' }.to_json)
+      end
+
+      before do
+        allow(custom_strategy).to receive(:access_token).and_return(access_token)
+        allow(access_token).to receive(:get)
+          .with('https://api.mlh.test/v4/users/me')
+          .and_return(response)
+      end
+
+      it 'fetches user data from the configured API base' do
+        custom_strategy.data
+
+        expect(access_token).to have_received(:get).with('https://api.mlh.test/v4/users/me')
       end
     end
 
@@ -149,12 +214,67 @@ RSpec.describe OmniAuth::Strategies::MLH do
       end
     end
 
-    context 'with API error' do
-      it 'returns empty hash on error' do
-        allow(access_token).to receive(:get).and_raise(StandardError)
+    context 'with OAuth2::Error' do
+      let(:error_response) do
+        instance_double(OAuth2::Response,
+                        status: 500,
+                        headers: {},
+                        body: '{"error": "server_error"}')
+      end
 
+      before do
+        allow(access_token).to receive(:get).and_raise(OAuth2::Error.new(error_response))
+      end
+
+      it 'returns empty payload for OAuth2 errors' do
         expect(strategy.data).to eq({})
       end
+    end
+
+    context 'with malformed JSON' do
+      before do
+        allow(access_token).to receive(:get)
+          .and_return(instance_double(OAuth2::Response, body: '<html>not json</html>'))
+      end
+
+      it 'returns empty payload for JSON parse failures' do
+        expect(strategy.data).to eq({})
+      end
+    end
+
+    context 'with unexpected error' do
+      let(:unexpected_error_class) { Class.new(StandardError) }
+
+      before do
+        allow(access_token).to receive(:get).and_raise(unexpected_error_class, 'boom')
+      end
+
+      it 'propagates unexpected errors' do
+        expect { strategy.data }.to raise_error(unexpected_error_class)
+      end
+    end
+  end
+
+  describe '#auth_hash' do
+    let(:strategy) do
+      described_class.new(app, 'client_id', 'client_secret', persist_credentials: false)
+    end
+
+    let(:empty_credentials) do
+      {
+        'token' => '',
+        'refresh_token' => nil,
+        'secret' => '',
+        'expires' => false
+      }
+    end
+
+    before do
+      allow(strategy).to receive(:data).and_return(id: 'core-user-1')
+    end
+
+    it 'omits bearer credentials when persistence is disabled' do
+      expect(strategy.auth_hash['credentials']).to eq(empty_credentials)
     end
   end
 
@@ -198,6 +318,27 @@ RSpec.describe OmniAuth::Strategies::MLH do
 
     it 'includes user roles' do
       expect(strategy.info[:roles]).to eq(['hacker'])
+    end
+  end
+
+  describe 'PKCE authorization' do
+    before { OmniAuth.config.test_mode = true }
+
+    after { OmniAuth.config.test_mode = false }
+
+    it 'uses S256 by default and sends the verifier only in token params' do
+      params = strategy.authorize_params
+
+      expect(params).to include(code_challenge: be_present, code_challenge_method: 'S256')
+      expect(params).not_to have_key(:code_verifier)
+      expect(strategy.token_params[:code_verifier]).to eq(strategy.options.pkce_verifier).and be_present
+    end
+
+    it 'can be disabled via the pkce option' do
+      disabled_strategy = described_class.new(app, 'client_id', 'client_secret', pkce: false)
+
+      expect(disabled_strategy.authorize_params).not_to include(:code_challenge, :code_challenge_method)
+      expect(disabled_strategy.token_params).not_to have_key(:code_verifier)
     end
   end
 end

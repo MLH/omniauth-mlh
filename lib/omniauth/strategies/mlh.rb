@@ -33,8 +33,13 @@ module OmniAuth
         site: 'https://www.mlh.com',
         authorize_url: '/oauth/authorize',
         token_url: 'https://api.mlh.com/v4/oauth/token',
+        api_site: 'https://api.mlh.com',
         auth_scheme: :request_body # Change from basic auth to request body
       }
+
+      option :pkce, true
+
+      option :persist_credentials, true
 
       # Support expandable fields through options
       option :expand_fields, []
@@ -65,7 +70,8 @@ module OmniAuth
 
       def data
         @data ||= fetch_and_process_data.compact
-      rescue StandardError
+      rescue ::OAuth2::Error, JSON::ParserError => e
+        OmniAuth.logger.warn("OmniAuth MLH: failed to load user data (#{e.class})")
         {}
       end
 
@@ -79,8 +85,21 @@ module OmniAuth
         symbolize_nested_arrays(data)
       end
 
+      # Preserve the OmniAuth credential shape without exposing bearer material.
+      def credentials
+        return super if options.persist_credentials
+
+        OmniAuth::AuthHash.new(
+          token: '',
+          refresh_token: nil,
+          secret: '',
+          expires: false
+        )
+      end
+
       def build_api_url
-        url = 'https://api.mlh.com/v4/users/me'
+        base = (options.dig(:client_options, :api_site) || 'https://api.mlh.com').to_s.chomp('/')
+        url = "#{base}/v4/users/me"
         expand_fields = options[:expand_fields] || []
         return url if expand_fields.empty?
 
