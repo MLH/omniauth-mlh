@@ -17,6 +17,31 @@ RSpec.describe OmniAuth::Strategies::MLH do
       expect(strategy.options.client_options.authorize_url).to eq('/oauth/authorize')
       expect(strategy.options.client_options.token_url).to eq('https://api.mlh.com/v4/oauth/token')
     end
+
+    context 'with only api_site overridden' do
+      let(:strategy) do
+        described_class.new(app, 'client_id', 'client_secret',
+                            client_options: { api_site: 'https://api.mlh.test' })
+      end
+
+      let(:token_request) do
+        stub_request(:post, 'https://api.mlh.com/v4/oauth/token')
+          .with(body: hash_including('client_id' => 'client_id', 'client_secret' => 'client_secret',
+                                     'code' => 'authorization-code', 'grant_type' => 'authorization_code'))
+          .to_return(body: { access_token: 'test-token', token_type: 'Bearer' }.to_json,
+                     headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'preserves the OAuth authorization endpoint' do
+        expect(strategy.client.authorize_url).to eq('https://www.mlh.com/oauth/authorize')
+      end
+
+      it 'exchanges a code at the default token endpoint with credentials in the request body' do
+        token_request
+        expect(strategy.client.auth_code.get_token('authorization-code').token).to eq('test-token')
+        expect(token_request).to have_been_requested
+      end
+    end
   end
 
   shared_context 'with oauth response' do |response_data|
@@ -34,6 +59,21 @@ RSpec.describe OmniAuth::Strategies::MLH do
   end
 
   describe '#data' do
+    [nil, false].each do |expand_fields|
+      context "with expand_fields set to #{expand_fields.inspect}" do
+        let(:strategy) do
+          described_class.new(app, 'client_id', 'client_secret', expand_fields: expand_fields)
+        end
+
+        include_context 'with oauth response', { 'id' => 'core-user-1' }
+
+        it 'fetches user data without expansion parameters' do
+          expect(strategy.data).to eq(id: 'core-user-1')
+          expect(access_token).to have_received(:get).with('https://api.mlh.com/v4/users/me')
+        end
+      end
+    end
+
     context 'with expandable fields' do
       let(:response) do
         instance_double(OAuth2::Response, body: {}.to_json, parsed: {})

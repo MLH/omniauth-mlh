@@ -100,7 +100,7 @@ module OmniAuth
       def build_api_url
         base = (options.dig(:client_options, :api_site) || 'https://api.mlh.com').to_s.chomp('/')
         url = "#{base}/v4/users/me"
-        expand_fields = options[:expand_fields]
+        expand_fields = options[:expand_fields] || []
         return url if expand_fields.empty?
 
         expand_query = expand_fields.map { |f| "expand[]=#{f}" }.join('&')
