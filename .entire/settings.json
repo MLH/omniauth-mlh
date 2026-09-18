@@ -1,0 +1,26 @@
+{
+  "checkpoints": {
+    "primary": {
+      "type": "git-refs"
+    }
+  },
+  "commit_linking": "always",
+  "enabled": true,
+  "review_default_profile": "general",
+  "review_profiles": {
+    "general": {
+      "task": "Review this change as a deployment-ready pull request reviewer, matching the standards of an automated CI reviewer.\n\nBefore reviewing, load any repo-specific review or build skills available in this environment, and follow the repo's AGENTS.md / CLAUDE.md for style and conventions.\n\nPrioritize real, actionable findings over generic commentary. Focus on:\n- Correctness and potential bugs\n- Security concerns\n- Deployment safety and operational risk\n- Maintainability and code quality\n- Performance considerations\n- Test coverage\n\nAnchor each finding to a specific file and line in the diff. Do not modify tracked files, create commits, or run the project's test suites. If a finding needs runtime evidence you cannot verify, state that narrow limitation inside the finding rather than adding a blanket disclaimer.\n\nClose with one verdict:\n- APPROVE when you find no substantive concerns.\n- REQUEST_CHANGES when you find substantive concerns.\n- COMMENT when concerns are non-blocking or you could not fully verify the change.",
+      "agents": {
+        "claude-code": {
+          "skills": [
+            "/review"
+          ]
+        }
+      },
+      "judge": {
+        "agent": "claude-code"
+      }
+    }
+  },
+  "telemetry": false
+}
