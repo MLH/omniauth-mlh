@@ -1,0 +1,21 @@
+.entire/.gitignore
+  s_2d58775ba9b06c::t_e7a57423cfe33c 1-5
+.entire/settings.json
+  s_2d58775ba9b06c::t_4d26cbc5c84988 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c8396f196538dbff1b38b4023a4360bd8740eed8",
+  "prompts": {},
+  "sessions": {
+    "s_2d58775ba9b06c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43abc824-893b-4752-bf69-dc3d380e07ba",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jonathan Gottfried <jonmarkgo@gmail.com>"
+    }
+  }
+}
